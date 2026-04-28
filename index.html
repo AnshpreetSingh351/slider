@@ -126,7 +126,7 @@
   .env-bar {
     position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 6px;
-    min-width: 340px;
+    min-width: 50vw;
     z-index: 10;
   }
   .env-time-display {
@@ -153,7 +153,7 @@
     padding: 10px 18px;
     display: flex; align-items: center; gap: 12px;
     box-shadow: 0 4px 32px rgba(0,0,0,0.4);
-    width: 360px;
+    width: 50vw;
   }
   .env-icon { font-size: 14px; opacity: 0.7; flex-shrink: 0; color: var(--gold); }
   .env-icon.moon { opacity: 0.5; }
@@ -933,7 +933,7 @@
   let lastTickTime   = performance.now();
 
   // Tweak these to taste:
-  const FRICTION_PER_FRAME = 0.94;   // 0.90 = stops fast, 0.97 = long glide
+  const FRICTION_PER_FRAME = 0.92;   // 0.90 = stops fast, 0.97 = long glide
   const DRAG_LERP_PER_FRAME = 0.001; // smaller = tighter follow during drag
   const VELOCITY_EMA        = 0.55;  // weight given to the newest velocity sample
 
@@ -983,19 +983,19 @@
         // Follow the slider tightly with a touch of smoothing
         const k = 1 - Math.pow(DRAG_LERP_PER_FRAME, dt / 16);
         displayedFloat += (targetFloat - displayedFloat) * k;
-      } else if (Math.abs(velocity) > 0.00005) {
-        // GLIDE — apply velocity & friction
+      } else if (Math.abs(velocity) > 0.00005 || Math.abs(displayedFloat - targetFloat) > 0.01) {
+        // GLIDE — apply velocity & friction toward targetFloat
         displayedFloat += velocity * dt;
         velocity       *= Math.pow(FRICTION_PER_FRAME, dt / 16);
+
+        // Pull toward target so we always settle exactly there
+        const pullStrength = 1 - Math.pow(0.85, dt / 16);
+        displayedFloat += (targetFloat - displayedFloat) * pullStrength;
 
         // Clamp at edges
         if (displayedFloat <= 0)               { displayedFloat = 0;               velocity = 0; }
         if (displayedFloat >= FRAME_COUNT - 1) { displayedFloat = FRAME_COUNT - 1; velocity = 0; }
 
-        // Sync the slider thumb so visuals match the gliding playback
-        slider.value = (displayedFloat / (FRAME_COUNT - 1)) * 24;
-        refreshSliderVisual();
-        targetFloat = displayedFloat;
       } else {
         // Tiny final ease to settle exactly
         const k = 1 - Math.pow(0.001, dt / 16);
