@@ -53,7 +53,7 @@
   }
   /* status pill */
   .video-status {
-    position: fixed; bottom: 84px; left: 32px;
+    position: fixed; top: 28px; right: 32px;
     font-family: 'Jost', sans-serif;
     font-size: 10px; letter-spacing: 0.18em;
     text-transform: uppercase;
@@ -113,7 +113,7 @@
 
   /* ─── BRANDING ────────────────────────────────────── */
   .brand {
-    position: fixed; bottom: 90px; right: 32px;
+    position: fixed; top: 38px; right: 32px;
     font-family: 'Cormorant Garamond', serif;
     font-size: 13px; font-weight: 400;
     letter-spacing: 0.28em;
@@ -122,11 +122,12 @@
     text-shadow: 0 1px 6px rgba(0,0,0,0.6);
   }
 
-  /* ─── TIME / ENVIRONMENT SLIDER ──────────────────── */
+  /* ─── TIME / ENVIRONMENT SLIDER (moved to bottom) ── */
   .env-bar {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 6px;
     min-width: 340px;
+    z-index: 10;
   }
   .env-time-display {
     font-family: 'Cormorant Garamond', serif;
@@ -206,9 +207,9 @@
     background: rgba(180,145,70,0.08);
   }
 
-  /* ─── FILTER BAR ──────────────────────────────────── */
+  /* ─── FILTER BAR (moved up since slider left the top) ── */
   .filter-bar {
-    position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+    position: fixed; top: 32px; left: 50%; transform: translateX(-50%);
     display: flex; gap: 8px; align-items: center;
     padding: 0;
   }
@@ -332,6 +333,7 @@
     display: flex; align-items: stretch;
     padding: 0 32px;
     box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+    z-index: 20;
   }
 
   .nav-item {
@@ -411,7 +413,6 @@
   }
   .nav-dd-item .dd-item-icon {
     font-size: 18px; line-height: 1;
-    /* using SVG-drawn placeholder boxes */
   }
   .nav-dd-item .dd-item-label {
     font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 300;
@@ -470,7 +471,6 @@
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .legend-count { margin-left: auto; color: var(--gold-dim); font-size: 10px; }
 
-  /* ─── SCROLL BUTTON RESET ─────────────────────────── */
   button { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
 
 </style>
@@ -478,36 +478,6 @@
 <body>
 
 <div class="scene">
-  <!--
-    ════════════════════════════════════════════════════════════════════
-    🎬  IMAGE-SEQUENCE SCRUB  (Apple-style ultra-smooth)
-    ════════════════════════════════════════════════════════════════════
-    SETUP (one-time, ~2 minutes):
-
-    1. Open a terminal in this folder. Create a "frames" subfolder:
-         mkdir frames
-
-    2. Extract frames from your video with ffmpeg:
-         ffmpeg -i your-video.mp4 -vf "fps=24,scale=1920:-1" -q:v 3 frames/frame_%04d.jpg
-
-       Tweak these numbers based on your needs:
-         fps=24       → frames per second of source video (24 = cinematic, 30 = smoother)
-         scale=1920   → output width (use 1280 for lighter weight, 1920 for crisp)
-         -q:v 3       → JPEG quality (1 = max, 5 = lighter; 3 is the sweet spot)
-
-    3. Count how many frames were created:
-         Windows:   dir frames /b | find /c /v ""
-         Mac/Linux: ls frames | wc -l
-
-    4. Update FRAME_COUNT in the <script> at the bottom to match.
-
-    5. Refresh the page. The slider now scrubs frame-perfect.
-
-    💡 OPTIONAL — for even smaller files, use WebP instead of JPG:
-         ffmpeg -i your-video.mp4 -vf "fps=24,scale=1920:-1" -quality 75 frames/frame_%04d.webp
-       Then change FRAME_EXT to ".webp" in the script.
-    ════════════════════════════════════════════════════════════════════
-  -->
   <canvas id="bgCanvas" class="bg-canvas"></canvas>
 </div>
 
@@ -523,41 +493,9 @@
 <!-- BRAND -->
 <div class="brand">Karl Detroit</div>
 
-<!-- ENVIRONMENT CONTROL -->
-<div class="env-bar">
-  <div class="env-time-display">
-    <span class="env-label">Environment</span>
-    <span id="timeVal">18:00</span>
-  </div>
-  <div class="env-slider-wrap">
-    <!-- sun icon -->
-    <svg class="sun-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-      <circle cx="10" cy="10" r="3.5"/>
-      <line x1="10" y1="2" x2="10" y2="4.5"/>
-      <line x1="10" y1="15.5" x2="10" y2="18"/>
-      <line x1="2" y1="10" x2="4.5" y2="10"/>
-      <line x1="15.5" y1="10" x2="18" y2="10"/>
-      <line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/>
-      <line x1="13.8" y1="13.8" x2="15.6" y2="15.6"/>
-      <line x1="15.6" y1="4.4" x2="13.8" y2="6.2"/>
-      <line x1="6.2" y1="13.8" x2="4.4" y2="15.6"/>
-    </svg>
-
-    <input type="range" class="env-range" id="envSlider" min="0" max="24" step="0.25" value="18"
-           style="--pct: 75%">
-
-    <!-- moon icon -->
-    <svg class="moon-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
-      <path d="M16 12.5A7 7 0 0 1 7.5 4a7 7 0 1 0 8.5 8.5z"/>
-    </svg>
-  </div>
-
-</div>
-
-<!-- FILTER BAR -->
+<!-- FILTER BAR (top) -->
 <div class="filter-bar">
 
-  <!-- PLOT TYPE -->
   <div class="filter-chip" id="fc-plot" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Plot Type
@@ -579,7 +517,6 @@
     </div>
   </div>
 
-  <!-- AVAILABILITY -->
   <div class="filter-chip" id="fc-avail" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Availability
@@ -601,7 +538,6 @@
     </div>
   </div>
 
-  <!-- ROOMS -->
   <div class="filter-chip" id="fc-rooms" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Bedrooms
@@ -626,7 +562,6 @@
     </div>
   </div>
 
-  <!-- DIRECTION -->
   <div class="filter-chip" id="fc-dir" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Direction
@@ -651,7 +586,6 @@
     </div>
   </div>
 
-  <!-- FLOOR -->
   <div class="filter-chip" id="fc-floor" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Floor
@@ -673,7 +607,6 @@
     </div>
   </div>
 
-  <!-- PRICE -->
   <div class="filter-chip" id="fc-price" onclick="toggleChip(this)">
     <div class="chip-dot"></div>
     Budget
@@ -695,10 +628,37 @@
 
 </div>
 
+<!-- ENVIRONMENT CONTROL (now near bottom, above the nav) -->
+<div class="env-bar">
+  <div class="env-time-display">
+    <span class="env-label">Environment</span>
+    <span id="timeVal">18:00</span>
+  </div>
+  <div class="env-slider-wrap">
+    <svg class="sun-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="10" cy="10" r="3.5"/>
+      <line x1="10" y1="2" x2="10" y2="4.5"/>
+      <line x1="10" y1="15.5" x2="10" y2="18"/>
+      <line x1="2" y1="10" x2="4.5" y2="10"/>
+      <line x1="15.5" y1="10" x2="18" y2="10"/>
+      <line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/>
+      <line x1="13.8" y1="13.8" x2="15.6" y2="15.6"/>
+      <line x1="15.6" y1="4.4" x2="13.8" y2="6.2"/>
+      <line x1="6.2" y1="13.8" x2="4.4" y2="15.6"/>
+    </svg>
+
+    <input type="range" class="env-range" id="envSlider" min="0" max="24" step="0.01" value="18"
+           style="--pct: 75%">
+
+    <svg class="moon-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M16 12.5A7 7 0 0 1 7.5 4a7 7 0 1 0 8.5 8.5z"/>
+    </svg>
+  </div>
+</div>
+
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
 
-  <!-- HOME -->
   <div class="nav-item active" id="nav-home" onclick="toggleNav(this)">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <path d="M3 9.5L10 3l7 6.5V18H13v-4.5H7V18H3V9.5z"/>
@@ -706,7 +666,6 @@
     Home
   </div>
 
-  <!-- GALLERY -->
   <div class="nav-item" id="nav-gallery" onclick="activateNav('nav-gallery')">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <rect x="2" y="4" width="16" height="12" rx="1.5"/>
@@ -716,7 +675,6 @@
     Gallery
   </div>
 
-  <!-- SURROUNDINGS -->
   <div class="nav-item" id="nav-surr" onclick="activateNav('nav-surr')">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <circle cx="10" cy="10" r="7"/>
@@ -726,7 +684,6 @@
     Surroundings
   </div>
 
-  <!-- AMENITIES -->
   <div class="nav-item" id="nav-amenities" onclick="toggleNav(this)">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <rect x="3" y="3" width="6" height="6" rx="1"/>
@@ -782,7 +739,6 @@
     </div>
   </div>
 
-  <!-- UNIT SEARCH -->
   <div class="nav-item" id="nav-units" onclick="toggleUnitPanel()">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <circle cx="9" cy="9" r="5"/>
@@ -857,10 +813,10 @@
 
 <script>
   // ── ENVIRONMENT SLIDER ──────────────────────────────
-  const slider = document.getElementById('envSlider');
+  const slider  = document.getElementById('envSlider');
   const timeVal = document.getElementById('timeVal');
 
-  function updateSlider() {
+  function refreshSliderVisual() {
     const v = parseFloat(slider.value);
     const h = Math.floor(v);
     const m = Math.round((v - h) * 60);
@@ -869,23 +825,15 @@
     slider.style.setProperty('--pct', pct + '%');
     slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(200,175,120,0.2) ${pct}%, rgba(200,175,120,0.2) 100%)`;
   }
-  slider.addEventListener('input', updateSlider);
-  updateSlider();
+  refreshSliderVisual();
 
-  // ─── IMAGE-SEQUENCE SCRUB ──────────────────────────────────────────────
-  // Preloads every frame as an Image, then draws to canvas on slider input.
-  // Optional frame-blending interpolates BETWEEN frames for sub-frame smoothness.
-  // ────────────────────────────────────────────────────────────────────────
-
-  // ⚙️  CONFIGURE THIS to match your extracted frames:
-  const FRAME_COUNT  = 372;           // total frames (update after running ffmpeg)
-  const FRAME_PATH   = 'frames/';     // folder containing frames
-  const FRAME_PREFIX = 'frame_';      // filename prefix
-  const FRAME_PAD    = 4;             // zero-padding (frame_0001 = pad 4)
-  const FRAME_EXT    = '.jpg';        // ".jpg" or ".webp"
-
-  // ✨  Visual smoothness toggle:
-  const ENABLE_BLEND = true;          // alpha-blend two adjacent frames for liquid smoothness
+  // ─── IMAGE-SEQUENCE SCRUB ───────────────────────────
+  const FRAME_COUNT  = 372;
+  const FRAME_PATH   = 'frames/';
+  const FRAME_PREFIX = 'frame_';
+  const FRAME_PAD    = 4;
+  const FRAME_EXT    = '.jpg';
+  const ENABLE_BLEND = true;
 
   const canvas       = document.getElementById('bgCanvas');
   const ctx          = canvas.getContext('2d');
@@ -893,27 +841,21 @@
   const statusText   = document.getElementById('statusText');
   const progressFill = document.getElementById('progressFill');
 
-  const frames       = new Array(FRAME_COUNT);
-  let   loadedCount  = 0;
-  let   ready        = false;
-  let   needsDraw    = false;
-  let   currentFloat = 0;             // current frame index as a float (for blending)
+  const frames      = new Array(FRAME_COUNT);
+  let   loadedCount = 0;
+  let   ready       = false;
 
-  // Show loading pill
   statusEl.classList.add('show');
 
-  // Resize canvas to match its CSS box (handles HiDPI for crispness)
   function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);  // cap at 2x to save GPU
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width  = window.innerWidth  * dpr;
     canvas.height = window.innerHeight * dpr;
     ctx.imageSmoothingQuality = 'high';
-    if (ready) drawAt(currentFloat);
   }
   window.addEventListener('resize', resizeCanvas);
   resizeCanvas();
 
-  // ── Preload every frame ─────────────────────────────────────────────────
   function preload() {
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
@@ -934,28 +876,26 @@
       ready = true;
       canvas.classList.add('ready');
       statusEl.classList.remove('show');
-      currentFloat = sliderToFrameFloat();
-      drawAt(currentFloat);
+      // initialize displayed frame to the slider's current value
+      displayedFloat = sliderToFrameFloat();
+      targetFloat    = displayedFloat;
     }
   }
-
   function onFrameError(num) {
     statusText.textContent = `❌ Frame "${FRAME_PREFIX}${num}${FRAME_EXT}" not found in /${FRAME_PATH}`;
     statusEl.classList.add('error');
   }
 
-  // ── Map slider value (0..24) to a fractional frame index ────────────────
   function sliderToFrameFloat() {
     const v = parseFloat(slider.value);
     return (v / 24) * (FRAME_COUNT - 1);
   }
 
-  // ── Draw a frame (or blended pair of frames) onto canvas ────────────────
   function drawImgCover(img, alpha) {
     const iw = img.naturalWidth, ih = img.naturalHeight;
     if (!iw || !ih) return;
     const cw = canvas.width, ch = canvas.height;
-    const scale = Math.max(cw / iw, ch / ih);   // object-fit: cover behaviour
+    const scale = Math.max(cw / iw, ch / ih);
     const dw = iw * scale, dh = ih * scale;
     const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
     ctx.globalAlpha = alpha;
@@ -964,36 +904,108 @@
 
   function drawAt(floatIndex) {
     if (!ready) return;
-    const lo = Math.floor(floatIndex);
+    const lo = Math.max(0, Math.floor(floatIndex));
     const hi = Math.min(FRAME_COUNT - 1, lo + 1);
-    const t  = floatIndex - lo;                  // 0..1 between adjacent frames
-
+    const t  = floatIndex - lo;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!ENABLE_BLEND || t === 0 || lo === hi) {
       drawImgCover(frames[lo], 1);
     } else {
-      // Crossfade — silky-smooth sub-frame transitions
       drawImgCover(frames[lo], 1);
       drawImgCover(frames[hi], t);
     }
     ctx.globalAlpha = 1;
   }
 
-  // ── rAF render loop — only redraws when needed (battery-friendly) ──────
+  // ═════════════════════════════════════════════════════════════════
+  // 🎯  INERTIA / SMOOTH-STOP SCRUBBING
+  //   While dragging — playback follows your finger/mouse with a
+  //   tiny lerp for buttery feel. On release, the captured velocity
+  //   keeps the playback gliding forward, decaying with friction
+  //   until it eases to a stop. The slider thumb visually follows.
+  // ═════════════════════════════════════════════════════════════════
+  let targetFloat    = 0;       // where the slider input most recently said
+  let displayedFloat = 0;       // what's actually drawn (may lag/glide)
+  let velocity       = 0;       // frames per millisecond
+  let isDragging     = false;
+  let lastSampleTime = 0;
+  let lastSampleVal  = 0;
+  let lastTickTime   = performance.now();
+
+  // Tweak these to taste:
+  const FRICTION_PER_FRAME = 0.94;   // 0.90 = stops fast, 0.97 = long glide
+  const DRAG_LERP_PER_FRAME = 0.001; // smaller = tighter follow during drag
+  const VELOCITY_EMA        = 0.55;  // weight given to the newest velocity sample
+
+  slider.addEventListener('pointerdown', () => {
+    isDragging     = true;
+    velocity       = 0;
+    lastSampleTime = performance.now();
+    lastSampleVal  = sliderToFrameFloat();
+  });
+  const endDrag = () => { isDragging = false; };
+  slider.addEventListener('pointerup',          endDrag);
+  slider.addEventListener('pointercancel',      endDrag);
+  slider.addEventListener('lostpointercapture', endDrag);
+
+  slider.addEventListener('input', () => {
+    refreshSliderVisual();
+    if (!ready) return;
+    const now      = performance.now();
+    const newFloat = sliderToFrameFloat();
+
+    if (isDragging) {
+      // Build a smoothed velocity (frames per ms) from each sample
+      if (lastSampleTime > 0) {
+        const dt = Math.max(1, now - lastSampleTime);
+        const instantVel = (newFloat - lastSampleVal) / dt;
+        velocity = velocity * (1 - VELOCITY_EMA) + instantVel * VELOCITY_EMA;
+      }
+      lastSampleTime = now;
+      lastSampleVal  = newFloat;
+      targetFloat    = newFloat;
+    } else {
+      // Keyboard / programmatic input — snap directly, no inertia
+      velocity       = 0;
+      targetFloat    = newFloat;
+      displayedFloat = newFloat;
+    }
+  });
+
+  // ── Continuous render loop ──────────────────────────
   function tick() {
-    if (needsDraw) {
-      drawAt(currentFloat);
-      needsDraw = false;
+    const now = performance.now();
+    const dt  = Math.min(50, now - lastTickTime); // cap dt so tab-switches don't catapult
+    lastTickTime = now;
+
+    if (ready) {
+      if (isDragging) {
+        // Follow the slider tightly with a touch of smoothing
+        const k = 1 - Math.pow(DRAG_LERP_PER_FRAME, dt / 16);
+        displayedFloat += (targetFloat - displayedFloat) * k;
+      } else if (Math.abs(velocity) > 0.00005) {
+        // GLIDE — apply velocity & friction
+        displayedFloat += velocity * dt;
+        velocity       *= Math.pow(FRICTION_PER_FRAME, dt / 16);
+
+        // Clamp at edges
+        if (displayedFloat <= 0)               { displayedFloat = 0;               velocity = 0; }
+        if (displayedFloat >= FRAME_COUNT - 1) { displayedFloat = FRAME_COUNT - 1; velocity = 0; }
+
+        // Sync the slider thumb so visuals match the gliding playback
+        slider.value = (displayedFloat / (FRAME_COUNT - 1)) * 24;
+        refreshSliderVisual();
+        targetFloat = displayedFloat;
+      } else {
+        // Tiny final ease to settle exactly
+        const k = 1 - Math.pow(0.001, dt / 16);
+        displayedFloat += (targetFloat - displayedFloat) * k;
+      }
+      drawAt(displayedFloat);
     }
     requestAnimationFrame(tick);
   }
   requestAnimationFrame(tick);
-
-  slider.addEventListener('input', () => {
-    if (!ready) return;
-    currentFloat = sliderToFrameFloat();
-    needsDraw = true;
-  });
 
   preload();
 
@@ -1006,7 +1018,6 @@
   // ── FILTER CHIPS ────────────────────────────────────
   let openChip = null;
   function toggleChip(el) {
-    // Don't close if clicking inside dropdown
     if (openChip && openChip !== el) {
       openChip.classList.remove('open', 'active');
     }
@@ -1018,13 +1029,10 @@
     evt.stopPropagation();
     el.classList.toggle('selected');
     el.querySelector('.dd-check').textContent = el.classList.contains('selected') ? '✓' : '';
-    // update parent chip active state
     const chip = el.closest('.filter-chip');
     const anySelected = chip.querySelectorAll('.dd-option.selected').length > 0;
     chip.classList.toggle('active', anySelected || chip.classList.contains('open'));
   }
-
-  // close on outside click
   document.addEventListener('click', function(e) {
     if (openChip && !openChip.contains(e.target)) {
       openChip.classList.remove('open');
@@ -1034,15 +1042,12 @@
 
   // ── BOTTOM NAV ──────────────────────────────────────
   let openNav = null;
-
   function activateNav(id) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     if (openNav) { openNav.classList.remove('open'); openNav = null; }
-    // close unit panel
     document.getElementById('unitPanel').classList.remove('open');
   }
-
   function toggleNav(el) {
     document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
     el.classList.add('active');
@@ -1055,20 +1060,16 @@
     openNav = el;
     document.getElementById('unitPanel').classList.remove('open');
   }
-
   function toggleUnitPanel() {
     document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
     document.getElementById('nav-units').classList.add('active');
     if (openNav) { openNav.classList.remove('open'); openNav = null; }
     document.getElementById('unitPanel').classList.toggle('open');
   }
-
   function toggleNavItem(evt, el) {
     evt.stopPropagation();
     el.classList.toggle('selected');
   }
-
-  // close nav dropdown on outside click
   document.addEventListener('click', function(e) {
     if (openNav && !openNav.contains(e.target)) {
       openNav.classList.remove('open');
