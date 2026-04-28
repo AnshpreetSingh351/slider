@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yoganad — Premium Property Visualization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: oklch(75% 0.08 75);
+    --gold-light: oklch(85% 0.06 75);
+    --gold-dim: oklch(60% 0.07 75);
+    --glass-bg: rgba(8, 8, 10, 0.55);
+    --glass-border: rgba(200, 175, 120, 0.18);
+    --glass-border-hover: rgba(200, 175, 120, 0.45);
+    --text-primary: rgba(240, 235, 220, 0.95);
+    --text-muted: rgba(200, 190, 165, 0.6);
+    --surface: rgba(14, 12, 10, 0.72);
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    overflow: hidden;
+    background: #0a0a0c;
+  }
+
+  /* BG scene (now hosts the slider-driven canvas) */
+  .scene {
+    position: fixed; inset: 0;
+    background: #0a0a0c;
+    filter: brightness(0.88);
+    overflow: hidden;
+  }
+  .bg-canvas {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .bg-canvas.ready { opacity: 1; }
+  .scene::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  /* status pill */
+  .video-status {
+    position: fixed; bottom: 84px; left: 32px;
+    font-family: 'Jost', sans-serif;
+    font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    color: var(--text-muted);
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    max-width: 380px;
+  }
+  .video-status.show { opacity: 1; }
+  .video-status.error { color: oklch(70% 0.18 30); border-color: oklch(50% 0.18 30); }
+  /* loading progress bar inside the status pill */
+  .video-status .progress-bar {
+    display: inline-block;
+    vertical-align: middle;
+    width: 80px; height: 2px;
+    background: rgba(200,175,120,0.15);
+    margin-left: 10px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .video-status .progress-fill {
+    height: 100%; width: 0%;
+    background: var(--gold);
+    transition: width 0.15s ease;
+  }
+
+  /* ─── COMPASS ─────────────────────────────────────── */
+  .compass {
+    position: fixed; top: 28px; left: 32px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Jost', sans-serif;
+    font-size: 13px; font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .compass::before {
+    content: '';
+    position: absolute;
+    top: 6px; left: 50%; transform: translateX(-50%);
+    width: 2px; height: 10px;
+    background: var(--gold);
+    border-radius: 1px;
+  }
+
+  /* ─── BRANDING ────────────────────────────────────── */
+  .brand {
+    position: fixed; bottom: 90px; right: 32px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px; font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+  }
+
+  /* ─── TIME / ENVIRONMENT SLIDER ──────────────────── */
+  .env-bar {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    min-width: 340px;
+  }
+  .env-time-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px; font-weight: 300;
+    color: var(--text-primary);
+    letter-spacing: 0.12em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+    position: relative;
+  }
+  .env-time-display .env-label {
+    font-family: 'Jost', sans-serif;
+    font-size: 9px; font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    display: block; text-align: center; margin-bottom: 2px;
+  }
+  .env-slider-wrap {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    border-radius: 40px;
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.4);
+    width: 360px;
+  }
+  .env-icon { font-size: 14px; opacity: 0.7; flex-shrink: 0; color: var(--gold); }
+  .env-icon.moon { opacity: 0.5; }
+
+  /* sun/moon icons drawn in CSS */
+  .sun-ico, .moon-ico {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+  }
+  .sun-ico { color: oklch(88% 0.12 85); }
+  .moon-ico { color: oklch(75% 0.05 220); opacity: 0.6; }
+
+  input[type=range].env-range {
+    -webkit-appearance: none;
+    flex: 1; height: 2px;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct, 72%), rgba(200,175,120,0.2) var(--pct, 72%), rgba(200,175,120,0.2) 100%);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range].env-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--gold);
+    border: 2px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 10px rgba(180,145,70,0.6);
+    cursor: pointer;
+  }
+
+  /* weather pills */
+  .weather-row {
+    display: flex; gap: 6px;
+    align-items: center;
+  }
+  .weather-pill {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 300;
+  }
+  .weather-pill:hover, .weather-pill.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(180,145,70,0.08);
+  }
+
+  /* ─── FILTER BAR ──────────────────────────────────── */
+  .filter-bar {
+    position: fixed; top: 130px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px; align-items: center;
+    padding: 0;
+  }
+  .filter-chip {
+    position: relative;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px);
+    border-radius: 30px;
+    padding: 9px 18px;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.22s;
+    white-space: nowrap;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+    user-select: none;
+  }
+  .filter-chip:hover {
+    border-color: var(--glass-border-hover);
+    color: var(--text-primary);
+    background: rgba(20,18,14,0.7);
+  }
+  .filter-chip.active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(180,145,70,0.1);
+  }
+  .filter-chip .chip-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--gold); opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .filter-chip.active .chip-dot { opacity: 1; }
+  .filter-chip .caret {
+    width: 8px; height: 8px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg) translateY(-2px);
+    transition: transform 0.2s;
+    opacity: 0.6;
+  }
+  .filter-chip.open .caret { transform: rotate(-135deg) translateY(-2px); }
+
+  /* filter dropdown */
+  .filter-dropdown {
+    position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
+    background: rgba(10, 9, 8, 0.9);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px);
+    border-radius: 14px;
+    padding: 8px;
+    min-width: 200px;
+    opacity: 0; pointer-events: none;
+    transform: translateX(-50%) translateY(-8px);
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 100;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,175,120,0.05);
+  }
+  .filter-chip.open .filter-dropdown {
+    opacity: 1; pointer-events: all;
+    transform: translateX(-50%) translateY(0);
+  }
+  .filter-dropdown-header {
+    font-size: 9px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--gold-dim);
+    padding: 6px 10px 10px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 6px;
+  }
+  .dd-option {
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.15s;
+    font-weight: 300;
+  }
+  .dd-option:hover { background: rgba(180,145,70,0.08); color: var(--text-primary); }
+  .dd-option.selected { color: var(--gold); }
+  .dd-option .dd-check {
+    width: 14px; height: 14px;
+    border: 1px solid var(--glass-border);
+    border-radius: 3px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px;
+  }
+  .dd-option.selected .dd-check {
+    background: var(--gold); border-color: var(--gold); color: #0a0a0a;
+  }
+  .dd-option .dd-badge {
+    margin-left: auto;
+    font-size: 9px; letter-spacing: 0.05em;
+    background: rgba(180,145,70,0.12);
+    color: var(--gold-dim);
+    border-radius: 10px; padding: 2px 7px;
+  }
+  .dd-option.selected .dd-badge {
+    background: rgba(180,145,70,0.2);
+    color: var(--gold);
+  }
+
+  /* availability color dots */
+  .avail-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  /* ─── BOTTOM NAV ──────────────────────────────────── */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    height: 68px;
+    background: rgba(6,5,4,0.82);
+    border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px);
+    display: flex; align-items: stretch;
+    padding: 0 32px;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+  }
+
+  .nav-item {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px;
+    padding: 0 28px;
+    cursor: pointer;
+    border-top: 2px solid transparent;
+    transition: all 0.22s;
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 300;
+    flex: 1;
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--text-primary); }
+  .nav-item.active {
+    color: var(--gold);
+    border-top-color: var(--gold);
+  }
+  .nav-item .nav-icon {
+    width: 18px; height: 18px;
+    opacity: 0.7;
+  }
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  /* NAV DROPDOWN (HOME AMENITIES) */
+  .nav-dropdown {
+    position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);
+    background: rgba(8,7,6,0.93);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(28px);
+    border-radius: 16px;
+    padding: 10px;
+    min-width: 240px;
+    opacity: 0; pointer-events: none;
+    transform: translateX(-50%) translateY(10px);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 200;
+    box-shadow: 0 -4px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,175,120,0.04);
+  }
+  .nav-item.open .nav-dropdown {
+    opacity: 1; pointer-events: all;
+    transform: translateX(-50%) translateY(0);
+  }
+  .nav-dropdown-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gold-dim);
+    padding: 8px 10px 10px;
+    border-bottom: 1px solid var(--glass-border);
+    margin-bottom: 8px;
+  }
+  .nav-dd-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+  }
+  .nav-dd-item {
+    padding: 12px 10px;
+    border-radius: 10px;
+    display: flex; flex-direction: column; gap: 5px;
+    cursor: pointer; transition: all 0.15s;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+  }
+  .nav-dd-item:hover {
+    background: rgba(180,145,70,0.07);
+    border-color: rgba(180,145,70,0.2);
+    color: var(--text-primary);
+  }
+  .nav-dd-item.selected {
+    background: rgba(180,145,70,0.1);
+    border-color: rgba(180,145,70,0.3);
+    color: var(--gold);
+  }
+  .nav-dd-item .dd-item-icon {
+    font-size: 18px; line-height: 1;
+    /* using SVG-drawn placeholder boxes */
+  }
+  .nav-dd-item .dd-item-label {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 300;
+  }
+  .nav-dd-item .dd-item-sub {
+    font-size: 9px; opacity: 0.5; letter-spacing: 0.06em;
+  }
+
+  /* ─── UNIT SEARCH PANEL ───────────────────────────── */
+  .unit-panel {
+    position: fixed; right: 0; top: 0; bottom: 68px;
+    width: 320px;
+    background: rgba(8,7,6,0.88);
+    border-left: 1px solid var(--glass-border);
+    backdrop-filter: blur(28px);
+    padding: 32px 24px;
+    display: flex; flex-direction: column; gap: 20px;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 50;
+    overflow-y: auto;
+  }
+  .unit-panel.open { transform: translateX(0); }
+  .panel-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px; font-weight: 400; letter-spacing: 0.08em;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 14px;
+  }
+  .panel-heading span { color: var(--gold); }
+  .panel-section-label {
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 8px; font-weight: 300;
+  }
+  .panel-range {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text-muted); letter-spacing: 0.06em;
+  }
+  input[type=range].panel-range-input {
+    -webkit-appearance: none; flex: 1; height: 2px;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) 55%, rgba(200,175,120,0.2) 55%);
+    border-radius: 2px; outline: none; cursor: pointer;
+  }
+  input[type=range].panel-range-input::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--gold);
+    border: 2px solid rgba(255,255,255,0.15);
+    box-shadow: 0 0 8px rgba(180,145,70,0.5);
+  }
+  .unit-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-row {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em;
+  }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .legend-count { margin-left: auto; color: var(--gold-dim); font-size: 10px; }
+
+  /* ─── SCROLL BUTTON RESET ─────────────────────────── */
+  button { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
+
+</style>
+</head>
+<body>
+
+<div class="scene">
+  <!--
+    ════════════════════════════════════════════════════════════════════
+    🎬  IMAGE-SEQUENCE SCRUB  (Apple-style ultra-smooth)
+    ════════════════════════════════════════════════════════════════════
+    SETUP (one-time, ~2 minutes):
+
+    1. Open a terminal in this folder. Create a "frames" subfolder:
+         mkdir frames
+
+    2. Extract frames from your video with ffmpeg:
+         ffmpeg -i your-video.mp4 -vf "fps=24,scale=1920:-1" -q:v 3 frames/frame_%04d.jpg
+
+       Tweak these numbers based on your needs:
+         fps=24       → frames per second of source video (24 = cinematic, 30 = smoother)
+         scale=1920   → output width (use 1280 for lighter weight, 1920 for crisp)
+         -q:v 3       → JPEG quality (1 = max, 5 = lighter; 3 is the sweet spot)
+
+    3. Count how many frames were created:
+         Windows:   dir frames /b | find /c /v ""
+         Mac/Linux: ls frames | wc -l
+
+    4. Update FRAME_COUNT in the <script> at the bottom to match.
+
+    5. Refresh the page. The slider now scrubs frame-perfect.
+
+    💡 OPTIONAL — for even smaller files, use WebP instead of JPG:
+         ffmpeg -i your-video.mp4 -vf "fps=24,scale=1920:-1" -quality 75 frames/frame_%04d.webp
+       Then change FRAME_EXT to ".webp" in the script.
+    ════════════════════════════════════════════════════════════════════
+  -->
+  <canvas id="bgCanvas" class="bg-canvas"></canvas>
+</div>
+
+<!-- loading / error indicator -->
+<div class="video-status" id="videoStatus">
+  <span id="statusText">Loading frames…</span>
+  <span class="progress-bar"><span class="progress-fill" id="progressFill"></span></span>
+</div>
+
+<!-- COMPASS -->
+<div class="compass">N</div>
+
+<!-- BRAND -->
+<div class="brand">Karl Detroit</div>
+
+<!-- ENVIRONMENT CONTROL -->
+<div class="env-bar">
+  <div class="env-time-display">
+    <span class="env-label">Environment</span>
+    <span id="timeVal">18:00</span>
+  </div>
+  <div class="env-slider-wrap">
+    <!-- sun icon -->
+    <svg class="sun-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="10" cy="10" r="3.5"/>
+      <line x1="10" y1="2" x2="10" y2="4.5"/>
+      <line x1="10" y1="15.5" x2="10" y2="18"/>
+      <line x1="2" y1="10" x2="4.5" y2="10"/>
+      <line x1="15.5" y1="10" x2="18" y2="10"/>
+      <line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/>
+      <line x1="13.8" y1="13.8" x2="15.6" y2="15.6"/>
+      <line x1="15.6" y1="4.4" x2="13.8" y2="6.2"/>
+      <line x1="6.2" y1="13.8" x2="4.4" y2="15.6"/>
+    </svg>
+
+    <input type="range" class="env-range" id="envSlider" min="0" max="24" step="0.25" value="18"
+           style="--pct: 75%">
+
+    <!-- moon icon -->
+    <svg class="moon-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M16 12.5A7 7 0 0 1 7.5 4a7 7 0 1 0 8.5 8.5z"/>
+    </svg>
+  </div>
+
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+
+  <!-- PLOT TYPE -->
+  <div class="filter-chip" id="fc-plot" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Plot Type
+    <div class="caret"></div>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-header">Select Plot Type</div>
+      <div class="dd-option selected" onclick="toggleDD(event,this)">
+        <div class="dd-check">✓</div>Residential<div class="dd-badge">42</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Commercial<div class="dd-badge">12</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Duplex<div class="dd-badge">8</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Penthouse<div class="dd-badge">4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AVAILABILITY -->
+  <div class="filter-chip" id="fc-avail" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Availability
+    <div class="caret"></div>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-header">Unit Availability</div>
+      <div class="dd-option selected" onclick="toggleDD(event,this)">
+        <div class="avail-dot" style="background:oklch(65% 0.18 145)"></div>
+        Available<div class="dd-badge">28</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="avail-dot" style="background:oklch(62% 0.18 30)"></div>
+        Reserved<div class="dd-badge">14</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="avail-dot" style="background:oklch(50% 0.0 0)"></div>
+        Sold<div class="dd-badge">20</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROOMS -->
+  <div class="filter-chip" id="fc-rooms" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Bedrooms
+    <div class="caret"></div>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-header">Number of Bedrooms</div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Studio<div class="dd-badge">6</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>1 Bedroom<div class="dd-badge">18</div>
+      </div>
+      <div class="dd-option selected" onclick="toggleDD(event,this)">
+        <div class="dd-check">✓</div>2 Bedrooms<div class="dd-badge">22</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>3 Bedrooms<div class="dd-badge">10</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>4+ Bedrooms<div class="dd-badge">6</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIRECTION -->
+  <div class="filter-chip" id="fc-dir" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Direction
+    <div class="caret"></div>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-header">Room Facing</div>
+      <div class="dd-option selected" onclick="toggleDD(event,this)">
+        <div class="dd-check">✓</div>North-Facing<div class="dd-badge">12</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>South-Facing<div class="dd-badge">15</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>East-Facing<div class="dd-badge">9</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>West-Facing<div class="dd-badge">9</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Corner Unit<div class="dd-badge">7</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOOR -->
+  <div class="filter-chip" id="fc-floor" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Floor
+    <div class="caret"></div>
+    <div class="filter-dropdown">
+      <div class="filter-dropdown-header">Floor Level</div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Ground (1–2)<div class="dd-badge">10</div>
+      </div>
+      <div class="dd-option selected" onclick="toggleDD(event,this)">
+        <div class="dd-check">✓</div>Mid (3–5)<div class="dd-badge">24</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>High (6–8)<div class="dd-badge">18</div>
+      </div>
+      <div class="dd-option" onclick="toggleDD(event,this)">
+        <div class="dd-check"></div>Penthouse (9+)<div class="dd-badge">4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRICE -->
+  <div class="filter-chip" id="fc-price" onclick="toggleChip(this)">
+    <div class="chip-dot"></div>
+    Budget
+    <div class="caret"></div>
+    <div class="filter-dropdown" style="min-width:220px">
+      <div class="filter-dropdown-header">Price Range</div>
+      <div style="padding: 10px 8px 6px; display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <div class="panel-section-label" style="margin-bottom:6px">Min — ₹ 45L</div>
+          <input type="range" class="panel-range-input" min="20" max="200" value="45" style="width:100%">
+        </div>
+        <div>
+          <div class="panel-section-label" style="margin-bottom:6px">Max — ₹ 1.8 Cr</div>
+          <input type="range" class="panel-range-input" min="20" max="500" value="180" style="width:100%">
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+
+  <!-- HOME -->
+  <div class="nav-item active" id="nav-home" onclick="toggleNav(this)">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <path d="M3 9.5L10 3l7 6.5V18H13v-4.5H7V18H3V9.5z"/>
+    </svg>
+    Home
+  </div>
+
+  <!-- GALLERY -->
+  <div class="nav-item" id="nav-gallery" onclick="activateNav('nav-gallery')">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <rect x="2" y="4" width="16" height="12" rx="1.5"/>
+      <circle cx="7" cy="9" r="1.5"/>
+      <path d="M2 15l4.5-4 3 3 3-2.5L18 15"/>
+    </svg>
+    Gallery
+  </div>
+
+  <!-- SURROUNDINGS -->
+  <div class="nav-item" id="nav-surr" onclick="activateNav('nav-surr')">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <circle cx="10" cy="10" r="7"/>
+      <circle cx="10" cy="10" r="1"/>
+      <path d="M10 3v2M10 15v2M3 10h2M15 10h2"/>
+    </svg>
+    Surroundings
+  </div>
+
+  <!-- AMENITIES -->
+  <div class="nav-item" id="nav-amenities" onclick="toggleNav(this)">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <rect x="3" y="3" width="6" height="6" rx="1"/>
+      <rect x="11" y="3" width="6" height="6" rx="1"/>
+      <rect x="3" y="11" width="6" height="6" rx="1"/>
+      <rect x="11" y="11" width="6" height="6" rx="1"/>
+    </svg>
+    Amenities
+    <div class="nav-dropdown">
+      <div class="nav-dropdown-title">Home Amenities</div>
+      <div class="nav-dd-grid">
+        <div class="nav-dd-item selected" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🏊</div>
+          <div class="dd-item-label">Swimming Pool</div>
+          <div class="dd-item-sub">Rooftop · Infinity</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🏋️</div>
+          <div class="dd-item-label">Gymnasium</div>
+          <div class="dd-item-sub">Level 2 · 2400 sq ft</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🌿</div>
+          <div class="dd-item-label">Sky Garden</div>
+          <div class="dd-item-sub">Levels 4 & 7</div>
+        </div>
+        <div class="nav-dd-item selected" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🛗</div>
+          <div class="dd-item-label">Concierge</div>
+          <div class="dd-item-sub">24-hr · Lobby</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🅿️</div>
+          <div class="dd-item-label">Parking</div>
+          <div class="dd-item-sub">Basement B1–B2</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🏸</div>
+          <div class="dd-item-label">Sports Court</div>
+          <div class="dd-item-sub">Badminton · Tennis</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🧖</div>
+          <div class="dd-item-label">Spa & Sauna</div>
+          <div class="dd-item-sub">Level 3 · Private</div>
+        </div>
+        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
+          <div class="dd-item-icon">🎪</div>
+          <div class="dd-item-label">Clubhouse</div>
+          <div class="dd-item-sub">Events · Lounge</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- UNIT SEARCH -->
+  <div class="nav-item" id="nav-units" onclick="toggleUnitPanel()">
+    <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
+      <circle cx="9" cy="9" r="5"/>
+      <line x1="13" y1="13" x2="17" y2="17"/>
+    </svg>
+    Unit Search
+  </div>
+
+</div>
+
+<!-- UNIT SEARCH SIDE PANEL -->
+<div class="unit-panel" id="unitPanel">
+  <div class="panel-heading">Unit <span>Search</span></div>
+
+  <div>
+    <div class="panel-section-label">Area (sq ft)</div>
+    <div class="panel-range">
+      <span>800</span>
+      <input type="range" class="panel-range-input" min="400" max="4000" value="1800">
+      <span>4000</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel-section-label">Availability Legend</div>
+    <div class="unit-legend">
+      <div class="legend-row">
+        <div class="legend-dot" style="background:oklch(65% 0.18 145)"></div>
+        Available Units
+        <div class="legend-count">28 units</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:oklch(62% 0.18 30)"></div>
+        Reserved
+        <div class="legend-count">14 units</div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-dot" style="background:oklch(45% 0.0 0)"></div>
+        Sold
+        <div class="legend-count">20 units</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel-section-label">Preferred Floor</div>
+    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+      <div class="weather-pill active">All</div>
+      <div class="weather-pill" onclick="setWeather(this)">1–3</div>
+      <div class="weather-pill" onclick="setWeather(this)">4–6</div>
+      <div class="weather-pill" onclick="setWeather(this)">7–9</div>
+      <div class="weather-pill" onclick="setWeather(this)">Pent</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="panel-section-label">Quick Match</div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <div class="dd-option selected" style="border-radius:8px; border:1px solid rgba(180,145,70,0.2);">
+        <div class="avail-dot" style="background:var(--gold)"></div>
+        2BR · Mid Floor · North
+        <div class="dd-badge">8 matches</div>
+      </div>
+      <div class="dd-option" style="border-radius:8px; border:1px solid var(--glass-border);">
+        <div class="avail-dot" style="background:var(--text-muted)"></div>
+        3BR · High Floor · Corner
+        <div class="dd-badge">3 matches</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── ENVIRONMENT SLIDER ──────────────────────────────
+  const slider = document.getElementById('envSlider');
+  const timeVal = document.getElementById('timeVal');
+
+  function updateSlider() {
+    const v = parseFloat(slider.value);
+    const h = Math.floor(v);
+    const m = Math.round((v - h) * 60);
+    timeVal.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+    const pct = (v / 24) * 100;
+    slider.style.setProperty('--pct', pct + '%');
+    slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(200,175,120,0.2) ${pct}%, rgba(200,175,120,0.2) 100%)`;
+  }
+  slider.addEventListener('input', updateSlider);
+  updateSlider();
+
+  // ─── IMAGE-SEQUENCE SCRUB ──────────────────────────────────────────────
+  // Preloads every frame as an Image, then draws to canvas on slider input.
+  // Optional frame-blending interpolates BETWEEN frames for sub-frame smoothness.
+  // ────────────────────────────────────────────────────────────────────────
+
+  // ⚙️  CONFIGURE THIS to match your extracted frames:
+  const FRAME_COUNT  = 120;           // total frames (update after running ffmpeg)
+  const FRAME_PATH   = 'frames/';     // folder containing frames
+  const FRAME_PREFIX = 'frame_';      // filename prefix
+  const FRAME_PAD    = 4;             // zero-padding (frame_0001 = pad 4)
+  const FRAME_EXT    = '.jpg';        // ".jpg" or ".webp"
+
+  // ✨  Visual smoothness toggle:
+  const ENABLE_BLEND = true;          // alpha-blend two adjacent frames for liquid smoothness
+
+  const canvas       = document.getElementById('bgCanvas');
+  const ctx          = canvas.getContext('2d');
+  const statusEl     = document.getElementById('videoStatus');
+  const statusText   = document.getElementById('statusText');
+  const progressFill = document.getElementById('progressFill');
+
+  const frames       = new Array(FRAME_COUNT);
+  let   loadedCount  = 0;
+  let   ready        = false;
+  let   needsDraw    = false;
+  let   currentFloat = 0;             // current frame index as a float (for blending)
+
+  // Show loading pill
+  statusEl.classList.add('show');
+
+  // Resize canvas to match its CSS box (handles HiDPI for crispness)
+  function resizeCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);  // cap at 2x to save GPU
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.imageSmoothingQuality = 'high';
+    if (ready) drawAt(currentFloat);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // ── Preload every frame ─────────────────────────────────────────────────
+  function preload() {
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      const num = String(i + 1).padStart(FRAME_PAD, '0');
+      img.src = `${FRAME_PATH}${FRAME_PREFIX}${num}${FRAME_EXT}`;
+      img.onload  = onFrameLoad;
+      img.onerror = () => onFrameError(num);
+      frames[i] = img;
+    }
+  }
+
+  function onFrameLoad() {
+    loadedCount++;
+    const pct = loadedCount / FRAME_COUNT;
+    progressFill.style.width = (pct * 100) + '%';
+    statusText.textContent = `Loading frames… ${Math.round(pct * 100)}%`;
+    if (loadedCount === FRAME_COUNT) {
+      ready = true;
+      canvas.classList.add('ready');
+      statusEl.classList.remove('show');
+      currentFloat = sliderToFrameFloat();
+      drawAt(currentFloat);
+    }
+  }
+
+  function onFrameError(num) {
+    statusText.textContent = `❌ Frame "${FRAME_PREFIX}${num}${FRAME_EXT}" not found in /${FRAME_PATH}`;
+    statusEl.classList.add('error');
+  }
+
+  // ── Map slider value (0..24) to a fractional frame index ────────────────
+  function sliderToFrameFloat() {
+    const v = parseFloat(slider.value);
+    return (v / 24) * (FRAME_COUNT - 1);
+  }
+
+  // ── Draw a frame (or blended pair of frames) onto canvas ────────────────
+  function drawImgCover(img, alpha) {
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    if (!iw || !ih) return;
+    const cw = canvas.width, ch = canvas.height;
+    const scale = Math.max(cw / iw, ch / ih);   // object-fit: cover behaviour
+    const dw = iw * scale, dh = ih * scale;
+    const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(img, dx, dy, dw, dh);
+  }
+
+  function drawAt(floatIndex) {
+    if (!ready) return;
+    const lo = Math.floor(floatIndex);
+    const hi = Math.min(FRAME_COUNT - 1, lo + 1);
+    const t  = floatIndex - lo;                  // 0..1 between adjacent frames
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!ENABLE_BLEND || t === 0 || lo === hi) {
+      drawImgCover(frames[lo], 1);
+    } else {
+      // Crossfade — silky-smooth sub-frame transitions
+      drawImgCover(frames[lo], 1);
+      drawImgCover(frames[hi], t);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // ── rAF render loop — only redraws when needed (battery-friendly) ──────
+  function tick() {
+    if (needsDraw) {
+      drawAt(currentFloat);
+      needsDraw = false;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  slider.addEventListener('input', () => {
+    if (!ready) return;
+    currentFloat = sliderToFrameFloat();
+    needsDraw = true;
+  });
+
+  preload();
+
+  // ── WEATHER PILLS ───────────────────────────────────
+  function setWeather(el) {
+    el.closest('.weather-row, div').querySelectorAll('.weather-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ── FILTER CHIPS ────────────────────────────────────
+  let openChip = null;
+  function toggleChip(el) {
+    // Don't close if clicking inside dropdown
+    if (openChip && openChip !== el) {
+      openChip.classList.remove('open', 'active');
+    }
+    el.classList.toggle('open');
+    el.classList.toggle('active', el.classList.contains('open'));
+    openChip = el.classList.contains('open') ? el : null;
+  }
+  function toggleDD(evt, el) {
+    evt.stopPropagation();
+    el.classList.toggle('selected');
+    el.querySelector('.dd-check').textContent = el.classList.contains('selected') ? '✓' : '';
+    // update parent chip active state
+    const chip = el.closest('.filter-chip');
+    const anySelected = chip.querySelectorAll('.dd-option.selected').length > 0;
+    chip.classList.toggle('active', anySelected || chip.classList.contains('open'));
+  }
+
+  // close on outside click
+  document.addEventListener('click', function(e) {
+    if (openChip && !openChip.contains(e.target)) {
+      openChip.classList.remove('open');
+      openChip = null;
+    }
+  });
+
+  // ── BOTTOM NAV ──────────────────────────────────────
+  let openNav = null;
+
+  function activateNav(id) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (openNav) { openNav.classList.remove('open'); openNav = null; }
+    // close unit panel
+    document.getElementById('unitPanel').classList.remove('open');
+  }
+
+  function toggleNav(el) {
+    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
+    el.classList.add('active');
+    if (openNav && openNav === el) {
+      el.classList.remove('open');
+      openNav = null;
+      return;
+    }
+    el.classList.add('open');
+    openNav = el;
+    document.getElementById('unitPanel').classList.remove('open');
+  }
+
+  function toggleUnitPanel() {
+    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
+    document.getElementById('nav-units').classList.add('active');
+    if (openNav) { openNav.classList.remove('open'); openNav = null; }
+    document.getElementById('unitPanel').classList.toggle('open');
+  }
+
+  function toggleNavItem(evt, el) {
+    evt.stopPropagation();
+    el.classList.toggle('selected');
+  }
+
+  // close nav dropdown on outside click
+  document.addEventListener('click', function(e) {
+    if (openNav && !openNav.contains(e.target)) {
+      openNav.classList.remove('open');
+      openNav = null;
+    }
+  });
+</script>
+</body>
+</html>
