@@ -29,7 +29,6 @@
     background: #0a0a0c;
   }
 
-  /* BG scene (now hosts the slider-driven canvas) */
   .scene {
     position: fixed; inset: 0;
     background: #0a0a0c;
@@ -51,6 +50,7 @@
     pointer-events: none;
     z-index: 2;
   }
+
   /* status pill */
   .video-status {
     position: fixed; top: 28px; right: 32px;
@@ -71,311 +71,211 @@
   }
   .video-status.show { opacity: 1; }
   .video-status.error { color: oklch(70% 0.18 30); border-color: oklch(50% 0.18 30); }
-  /* loading progress bar inside the status pill */
   .video-status .progress-bar {
-    display: inline-block;
-    vertical-align: middle;
+    display: inline-block; vertical-align: middle;
     width: 80px; height: 2px;
-    background: rgba(200,175,120,0.15);
-    margin-left: 10px;
-    border-radius: 2px;
-    overflow: hidden;
+    background: rgba(200,175,120,0.15); margin-left: 10px;
+    border-radius: 2px; overflow: hidden;
   }
   .video-status .progress-fill {
-    height: 100%; width: 0%;
-    background: var(--gold);
-    transition: width 0.15s ease;
+    height: 100%; width: 0%; background: var(--gold); transition: width 0.15s ease;
   }
 
   /* ─── COMPASS ─────────────────────────────────────── */
   .compass {
     position: fixed; top: 28px; left: 32px;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
     backdrop-filter: blur(14px);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Jost', sans-serif;
-    font-size: 13px; font-weight: 400;
-    color: var(--gold);
-    letter-spacing: 0.05em;
+    font-family: 'Jost', sans-serif; font-size: 13px; font-weight: 400;
+    color: var(--gold); letter-spacing: 0.05em;
     box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    z-index: 30;
   }
   .compass::before {
-    content: '';
-    position: absolute;
+    content: ''; position: absolute;
     top: 6px; left: 50%; transform: translateX(-50%);
-    width: 2px; height: 10px;
-    background: var(--gold);
-    border-radius: 1px;
+    width: 2px; height: 10px; background: var(--gold); border-radius: 1px;
   }
 
   /* ─── BRANDING ────────────────────────────────────── */
   .brand {
     position: fixed; top: 38px; right: 32px;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 13px; font-weight: 400;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--gold-dim);
+    font-size: 13px; font-weight: 400; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--gold-dim);
     text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    z-index: 30;
   }
 
-  /* ─── TIME / ENVIRONMENT SLIDER (moved to bottom) ── */
+  /* ─── ENVIRONMENT SLIDER ─────────────────────────── */
   .env-bar {
     position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
     display: flex; flex-direction: column; align-items: center; gap: 6px;
-    min-width: 50vw;
-    z-index: 10;
+    min-width: 50vw; z-index: 10;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
   .env-time-display {
     font-family: 'Cormorant Garamond', serif;
     font-size: 22px; font-weight: 300;
-    color: var(--text-primary);
-    letter-spacing: 0.12em;
-    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
-    position: relative;
+    color: var(--text-primary); letter-spacing: 0.12em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7); position: relative;
   }
   .env-time-display .env-label {
-    font-family: 'Jost', sans-serif;
-    font-size: 9px; font-weight: 300;
-    letter-spacing: 0.2em;
-    color: var(--gold-dim);
-    text-transform: uppercase;
+    font-family: 'Jost', sans-serif; font-size: 9px; font-weight: 300;
+    letter-spacing: 0.2em; color: var(--gold-dim); text-transform: uppercase;
     display: block; text-align: center; margin-bottom: 2px;
   }
   .env-slider-wrap {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(18px);
-    border-radius: 40px;
-    padding: 10px 18px;
-    display: flex; align-items: center; gap: 12px;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.4);
-    width: 50vw;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(18px); border-radius: 40px;
+    padding: 10px 18px; display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.4); width: 50vw;
   }
-  .env-icon { font-size: 14px; opacity: 0.7; flex-shrink: 0; color: var(--gold); }
-  .env-icon.moon { opacity: 0.5; }
-
-  /* sun/moon icons drawn in CSS */
-  .sun-ico, .moon-ico {
-    width: 16px; height: 16px;
-    flex-shrink: 0;
-  }
+  .sun-ico, .moon-ico { width: 16px; height: 16px; flex-shrink: 0; }
   .sun-ico { color: oklch(88% 0.12 85); }
   .moon-ico { color: oklch(75% 0.05 220); opacity: 0.6; }
 
   input[type=range].env-range {
-    -webkit-appearance: none;
-    flex: 1; height: 2px;
-    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct, 72%), rgba(200,175,120,0.2) var(--pct, 72%), rgba(200,175,120,0.2) 100%);
+    -webkit-appearance: none; flex: 1; height: 2px;
     border-radius: 2px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) var(--pct,75%), rgba(200,175,120,0.2) var(--pct,75%), rgba(200,175,120,0.2) 100%);
   }
   input[type=range].env-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--gold);
-    border: 2px solid rgba(255,255,255,0.2);
-    box-shadow: 0 0 10px rgba(180,145,70,0.6);
-    cursor: pointer;
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--gold); border: 2px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 10px rgba(180,145,70,0.6); cursor: pointer;
+  }
+  input[type=range].env-range::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--gold); border: 2px solid rgba(255,255,255,0.2);
+    box-shadow: 0 0 10px rgba(180,145,70,0.6); cursor: pointer;
   }
 
   /* weather pills */
-  .weather-row {
-    display: flex; gap: 6px;
-    align-items: center;
-  }
   .weather-pill {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(14px);
-    border-radius: 20px;
-    padding: 5px 12px;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 300;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px); border-radius: 20px;
+    padding: 5px 12px; font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-muted);
+    cursor: pointer; transition: all 0.2s; font-weight: 300;
   }
   .weather-pill:hover, .weather-pill.active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(180,145,70,0.08);
+    border-color: var(--gold); color: var(--gold); background: rgba(180,145,70,0.08);
   }
 
-  /* ─── FILTER BAR (moved up since slider left the top) ── */
+  /* ─── FILTER BAR ─────────────────────────────────── */
   .filter-bar {
     position: fixed; top: 32px; left: 50%; transform: translateX(-50%);
-    display: flex; gap: 8px; align-items: center;
-    padding: 0;
+    display: flex; gap: 8px; align-items: center; padding: 0;
+    z-index: 25;
+    transition: opacity 0.4s ease, transform 0.4s ease;
   }
+  /* auto-hide state */
+  .filter-bar.ui-hidden {
+    opacity: 0; pointer-events: none;
+    transform: translateX(-50%) translateY(-20px);
+  }
+
   .filter-chip {
-    position: relative;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(18px);
-    border-radius: 30px;
-    padding: 9px 18px;
+    position: relative; background: var(--glass-bg);
+    border: 1px solid var(--glass-border); backdrop-filter: blur(18px);
+    border-radius: 30px; padding: 9px 18px;
     display: flex; align-items: center; gap: 7px;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.22s;
-    white-space: nowrap;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.3);
-    user-select: none;
+    font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-muted); cursor: pointer; transition: all 0.22s;
+    white-space: nowrap; box-shadow: 0 2px 16px rgba(0,0,0,0.3); user-select: none;
   }
-  .filter-chip:hover {
-    border-color: var(--glass-border-hover);
-    color: var(--text-primary);
-    background: rgba(20,18,14,0.7);
-  }
-  .filter-chip.active {
-    border-color: var(--gold);
-    color: var(--gold);
-    background: rgba(180,145,70,0.1);
-  }
-  .filter-chip .chip-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--gold); opacity: 0;
-    transition: opacity 0.2s;
-  }
+  .filter-chip:hover { border-color: var(--glass-border-hover); color: var(--text-primary); background: rgba(20,18,14,0.7); }
+  .filter-chip.active { border-color: var(--gold); color: var(--gold); background: rgba(180,145,70,0.1); }
+  .filter-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0; transition: opacity 0.2s; }
   .filter-chip.active .chip-dot { opacity: 1; }
   .filter-chip .caret {
-    width: 8px; height: 8px;
-    border-right: 1.5px solid currentColor;
+    width: 8px; height: 8px; border-right: 1.5px solid currentColor;
     border-bottom: 1.5px solid currentColor;
-    transform: rotate(45deg) translateY(-2px);
-    transition: transform 0.2s;
-    opacity: 0.6;
+    transform: rotate(45deg) translateY(-2px); transition: transform 0.2s; opacity: 0.6;
   }
   .filter-chip.open .caret { transform: rotate(-135deg) translateY(-2px); }
 
-  /* filter dropdown */
+  /* filter dropdown — FIXED: overflow visible on parent, high z-index */
   .filter-dropdown {
-    position: absolute; top: calc(100% + 10px); left: 50%; transform: translateX(-50%);
-    background: rgba(10, 9, 8, 0.9);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px);
-    border-radius: 14px;
-    padding: 8px;
-    min-width: 200px;
-    opacity: 0; pointer-events: none;
+    position: absolute; top: calc(100% + 10px); left: 50%;
     transform: translateX(-50%) translateY(-8px);
+    background: rgba(10,9,8,0.95);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px); border-radius: 14px; padding: 8px;
+    min-width: 200px; opacity: 0; pointer-events: none;
     transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 100;
-    box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(200,175,120,0.05);
+    z-index: 9999;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,175,120,0.05);
   }
   .filter-chip.open .filter-dropdown {
     opacity: 1; pointer-events: all;
     transform: translateX(-50%) translateY(0);
   }
   .filter-dropdown-header {
-    font-size: 9px; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--gold-dim);
-    padding: 6px 10px 10px;
-    border-bottom: 1px solid var(--glass-border);
-    margin-bottom: 6px;
+    font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--gold-dim); padding: 6px 10px 10px;
+    border-bottom: 1px solid var(--glass-border); margin-bottom: 6px;
   }
   .dd-option {
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--text-muted);
-    cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
-    transition: all 0.15s;
-    font-weight: 300;
+    padding: 10px 12px; border-radius: 8px; font-size: 12px;
+    letter-spacing: 0.08em; color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; gap: 10px; transition: all 0.15s; font-weight: 300;
   }
   .dd-option:hover { background: rgba(180,145,70,0.08); color: var(--text-primary); }
   .dd-option.selected { color: var(--gold); }
   .dd-option .dd-check {
-    width: 14px; height: 14px;
-    border: 1px solid var(--glass-border);
+    width: 14px; height: 14px; border: 1px solid var(--glass-border);
     border-radius: 3px; flex-shrink: 0;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 9px;
   }
-  .dd-option.selected .dd-check {
-    background: var(--gold); border-color: var(--gold); color: #0a0a0a;
-  }
+  .dd-option.selected .dd-check { background: var(--gold); border-color: var(--gold); color: #0a0a0a; }
   .dd-option .dd-badge {
-    margin-left: auto;
-    font-size: 9px; letter-spacing: 0.05em;
-    background: rgba(180,145,70,0.12);
-    color: var(--gold-dim);
+    margin-left: auto; font-size: 9px; letter-spacing: 0.05em;
+    background: rgba(180,145,70,0.12); color: var(--gold-dim);
     border-radius: 10px; padding: 2px 7px;
   }
-  .dd-option.selected .dd-badge {
-    background: rgba(180,145,70,0.2);
-    color: var(--gold);
-  }
+  .dd-option.selected .dd-badge { background: rgba(180,145,70,0.2); color: var(--gold); }
+  .avail-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-  /* availability color dots */
-  .avail-dot {
-    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  }
-
-  /* ─── BOTTOM NAV ──────────────────────────────────── */
+  /* ─── BOTTOM NAV ─────────────────────────────────── */
   .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    height: 68px;
-    background: rgba(6,5,4,0.82);
-    border-top: 1px solid var(--glass-border);
-    backdrop-filter: blur(24px);
-    display: flex; align-items: stretch;
-    padding: 0 32px;
-    box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
-    z-index: 20;
+    position: fixed; bottom: 0; left: 0; right: 0; height: 68px;
+    background: rgba(6,5,4,0.82); border-top: 1px solid var(--glass-border);
+    backdrop-filter: blur(24px); display: flex; align-items: stretch;
+    padding: 0 32px; box-shadow: 0 -8px 40px rgba(0,0,0,0.5); z-index: 20;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  /* auto-hide state */
+  .bottom-nav.ui-hidden {
+    opacity: 0; pointer-events: none;
+    transform: translateY(100%);
   }
 
   .nav-item {
     position: relative;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 5px;
-    padding: 0 28px;
-    cursor: pointer;
-    border-top: 2px solid transparent;
-    transition: all 0.22s;
-    color: var(--text-muted);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    font-weight: 300;
-    flex: 1;
-    user-select: none;
+    gap: 5px; padding: 0 28px; cursor: pointer;
+    border-top: 2px solid transparent; transition: all 0.22s;
+    color: var(--text-muted); font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; font-weight: 300; flex: 1; user-select: none;
   }
   .nav-item:hover { color: var(--text-primary); }
-  .nav-item.active {
-    color: var(--gold);
-    border-top-color: var(--gold);
-  }
-  .nav-item .nav-icon {
-    width: 18px; height: 18px;
-    opacity: 0.7;
-  }
+  .nav-item.active { color: var(--gold); border-top-color: var(--gold); }
+  .nav-item .nav-icon { width: 18px; height: 18px; opacity: 0.7; }
   .nav-item.active .nav-icon { opacity: 1; }
 
-  /* NAV DROPDOWN (HOME AMENITIES) */
+  /* NAV DROPDOWN */
   .nav-dropdown {
-    position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%);
-    background: rgba(8,7,6,0.93);
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(28px);
-    border-radius: 16px;
-    padding: 10px;
-    min-width: 240px;
-    opacity: 0; pointer-events: none;
+    position: absolute; bottom: calc(100% + 12px); left: 50%;
     transform: translateX(-50%) translateY(10px);
+    background: rgba(8,7,6,0.95); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(28px); border-radius: 16px; padding: 10px;
+    min-width: 240px; opacity: 0; pointer-events: none;
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 200;
+    z-index: 9999;
     box-shadow: 0 -4px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(200,175,120,0.04);
   }
   .nav-item.open .nav-dropdown {
@@ -383,65 +283,36 @@
     transform: translateX(-50%) translateY(0);
   }
   .nav-dropdown-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 11px; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--gold-dim);
-    padding: 8px 10px 10px;
-    border-bottom: 1px solid var(--glass-border);
-    margin-bottom: 8px;
+    font-family: 'Cormorant Garamond', serif; font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-dim);
+    padding: 8px 10px 10px; border-bottom: 1px solid var(--glass-border); margin-bottom: 8px;
   }
-  .nav-dd-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
-  }
+  .nav-dd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
   .nav-dd-item {
-    padding: 12px 10px;
-    border-radius: 10px;
+    padding: 12px 10px; border-radius: 10px;
     display: flex; flex-direction: column; gap: 5px;
-    cursor: pointer; transition: all 0.15s;
-    color: var(--text-muted);
-    border: 1px solid transparent;
+    cursor: pointer; transition: all 0.15s; color: var(--text-muted); border: 1px solid transparent;
   }
-  .nav-dd-item:hover {
-    background: rgba(180,145,70,0.07);
-    border-color: rgba(180,145,70,0.2);
-    color: var(--text-primary);
-  }
-  .nav-dd-item.selected {
-    background: rgba(180,145,70,0.1);
-    border-color: rgba(180,145,70,0.3);
-    color: var(--gold);
-  }
-  .nav-dd-item .dd-item-icon {
-    font-size: 18px; line-height: 1;
-  }
-  .nav-dd-item .dd-item-label {
-    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 300;
-  }
-  .nav-dd-item .dd-item-sub {
-    font-size: 9px; opacity: 0.5; letter-spacing: 0.06em;
-  }
+  .nav-dd-item:hover { background: rgba(180,145,70,0.07); border-color: rgba(180,145,70,0.2); color: var(--text-primary); }
+  .nav-dd-item.selected { background: rgba(180,145,70,0.1); border-color: rgba(180,145,70,0.3); color: var(--gold); }
+  .nav-dd-item .dd-item-icon { font-size: 18px; line-height: 1; }
+  .nav-dd-item .dd-item-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 300; }
+  .nav-dd-item .dd-item-sub { font-size: 9px; opacity: 0.5; letter-spacing: 0.06em; }
 
-  /* ─── UNIT SEARCH PANEL ───────────────────────────── */
+  /* ─── UNIT SEARCH PANEL ─────────────────────────── */
   .unit-panel {
-    position: fixed; right: 0; top: 0; bottom: 68px;
-    width: 320px;
-    background: rgba(8,7,6,0.88);
-    border-left: 1px solid var(--glass-border);
-    backdrop-filter: blur(28px);
-    padding: 32px 24px;
+    position: fixed; right: 0; top: 0; bottom: 68px; width: 320px;
+    background: rgba(8,7,6,0.88); border-left: 1px solid var(--glass-border);
+    backdrop-filter: blur(28px); padding: 32px 24px;
     display: flex; flex-direction: column; gap: 20px;
-    transform: translateX(100%);
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 50;
-    overflow-y: auto;
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 50; overflow-y: auto;
   }
   .unit-panel.open { transform: translateX(0); }
   .panel-heading {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px; font-weight: 400; letter-spacing: 0.08em;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--glass-border);
-    padding-bottom: 14px;
+    font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400;
+    letter-spacing: 0.08em; color: var(--text-primary);
+    border-bottom: 1px solid var(--glass-border); padding-bottom: 14px;
   }
   .panel-heading span { color: var(--gold); }
   .panel-section-label {
@@ -452,150 +323,136 @@
     display: flex; align-items: center; gap: 10px;
     font-size: 12px; color: var(--text-muted); letter-spacing: 0.06em;
   }
+  /* FIXED: range inputs — dynamic background via JS, proper thumb on all browsers */
   input[type=range].panel-range-input {
     -webkit-appearance: none; flex: 1; height: 2px;
-    background: linear-gradient(to right, var(--gold) 0%, var(--gold) 55%, rgba(200,175,120,0.2) 55%);
     border-radius: 2px; outline: none; cursor: pointer;
+    background: linear-gradient(to right, var(--gold) 0%, var(--gold) 55%, rgba(200,175,120,0.2) 55%, rgba(200,175,120,0.2) 100%);
   }
   input[type=range].panel-range-input::-webkit-slider-thumb {
     -webkit-appearance: none; width: 14px; height: 14px;
     border-radius: 50%; background: var(--gold);
-    border: 2px solid rgba(255,255,255,0.15);
-    box-shadow: 0 0 8px rgba(180,145,70,0.5);
+    border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 0 8px rgba(180,145,70,0.5);
+    cursor: pointer;
   }
+  input[type=range].panel-range-input::-moz-range-thumb {
+    width: 14px; height: 14px; border-radius: 50%; background: var(--gold);
+    border: 2px solid rgba(255,255,255,0.15); box-shadow: 0 0 8px rgba(180,145,70,0.5);
+    cursor: pointer;
+  }
+
   .unit-legend { display: flex; flex-direction: column; gap: 8px; }
-  .legend-row {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em;
-  }
+  .legend-row { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; }
   .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .legend-count { margin-left: auto; color: var(--gold-dim); font-size: 10px; }
 
+  /* floor pills container */
+  .floor-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  /* price range labels */
+  .price-label { font-size: 10px; color: var(--gold-dim); letter-spacing: 0.1em; margin-bottom: 4px; font-family: 'Jost', sans-serif; }
+
   button { background: none; border: none; cursor: pointer; color: inherit; font: inherit; }
 
+  /* ─── UI TOGGLE BUTTON (mobile, shows when UI is hidden) ────── */
+  .ui-toggle-btn {
+    display: none;
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    backdrop-filter: blur(14px); border-radius: 30px;
+    padding: 8px 20px; color: var(--gold); font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .ui-toggle-btn:hover { border-color: var(--gold); background: rgba(180,145,70,0.1); }
 
-
-  /* ═══════════════════════════════════════════════════════
-     MOBILE LANDSCAPE  — max-height: 500px & orientation: landscape
-     Targets phones rotated sideways (typically 320–430px tall,
-     600–900px wide). Everything shrinks, repositions, or collapses
-     to keep the canvas visible and all controls reachable.
-  ═══════════════════════════════════════════════════════ */
+  /* ══════════════════════════════════════════════════════
+     MOBILE LANDSCAPE
+  ══════════════════════════════════════════════════════ */
   @media (max-height: 500px) and (orientation: landscape) {
 
-    /* ── Compass: smaller, top-left ── */
-    .compass {
-      width: 38px; height: 38px;
-      top: 10px; left: 10px;
-      font-size: 11px;
-    }
+    /* Show the toggle button on mobile */
+    .ui-toggle-btn { display: block; }
+
+    /* Compass */
+    .compass { width: 38px; height: 38px; top: 10px; left: 10px; font-size: 11px; }
     .compass::before { top: 4px; height: 7px; }
 
-    /* ── Brand: top-right, smaller ── */
-    .brand {
-      top: 17px; right: 12px;
-      font-size: 10px; letter-spacing: 0.18em;
-    }
+    /* Brand */
+    .brand { top: 17px; right: 12px; font-size: 10px; letter-spacing: 0.18em; }
 
-    /* ── Status pill ── */
-    .video-status {
-      top: 10px; right: 12px;
-      font-size: 9px; padding: 4px 10px;
-    }
+    /* Status pill */
+    .video-status { top: 10px; right: 12px; font-size: 9px; padding: 4px 10px; }
 
-    /* ── Filter bar: horizontally scrollable strip ── */
+    /* Filter bar: scrollable strip, starts hidden */
     .filter-bar {
-      top: 10px;
-      left: 0; right: 0;
-      padding: 0 100px 0 58px;
+      top: 10px; left: 0; right: 0;
+      padding: 0 110px 0 58px;
       transform: none;
-      overflow-x: auto;
-      overflow-y: visible;
+      overflow-x: auto; overflow-y: visible;
       -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      flex-wrap: nowrap;
-      justify-content: flex-start;
-      gap: 5px;
+      scrollbar-width: none; flex-wrap: nowrap;
+      justify-content: flex-start; gap: 5px;
+      /* start visible, JS handles hide */
     }
+    .filter-bar.ui-hidden { transform: translateY(-60px); }
     .filter-bar::-webkit-scrollbar { display: none; }
 
-    .filter-chip {
-      padding: 5px 11px;
-      font-size: 9px; letter-spacing: 0.1em;
-      border-radius: 20px;
-      flex-shrink: 0;
-    }
+    .filter-chip { padding: 5px 11px; font-size: 9px; letter-spacing: 0.1em; border-radius: 20px; flex-shrink: 0; }
     .filter-chip .caret { width: 6px; height: 6px; }
 
-    /* Dropdowns: open below, scrollable */
+    /* Dropdowns on mobile: fixed positioning to avoid overflow clipping */
     .filter-dropdown {
-      top: calc(100% + 6px);
-      max-height: 55vh;
-      overflow-y: auto;
-      min-width: 170px;
+      position: fixed;
+      top: 54px;
+      left: auto;
+      transform: none;
+      max-height: 60vh; overflow-y: auto; min-width: 170px;
     }
-    .dd-option { padding: 7px 10px; font-size: 11px; }
+    .filter-chip.open .filter-dropdown {
+      transform: none;
+    }
 
-    /* ── Env bar: compact vertical strip on LEFT side ── */
+    /* ENV BAR: centered horizontally, above the nav */
     .env-bar {
-      bottom: auto;
-      top: 50%;
-      left: 10px;
-      right: auto;
-      transform: translateY(-50%);
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      min-width: 0;
+      bottom: 58px;
+      left: 50%; right: auto;
+      transform: translateX(-50%);
+      top: auto;
+      flex-direction: column; align-items: center; gap: 4px;
+      min-width: 0; width: auto;
     }
-    .env-time-display {
-      font-size: 13px; letter-spacing: 0.06em;
-      text-align: center;
-    }
-    .env-time-display .env-label {
-      font-size: 7px; letter-spacing: 0.12em;
-      margin-bottom: 1px;
-    }
+    .env-time-display { font-size: 13px; letter-spacing: 0.06em; text-align: center; }
+    .env-time-display .env-label { font-size: 7px; letter-spacing: 0.12em; margin-bottom: 1px; }
     .env-slider-wrap {
-      width: auto;
-      padding: 8px 10px;
-      flex-direction: column;
-      gap: 8px;
-      border-radius: 30px;
+      width: auto; min-width: 180px;
+      padding: 8px 14px; flex-direction: row;
+      gap: 10px; border-radius: 30px;
     }
     input[type=range].env-range {
-      writing-mode: vertical-lr;
-      direction: rtl;
-      width: 2px;
-      height: 80px;
-      flex: none;
-    }
-    input[type=range].env-range::-webkit-slider-thumb {
-      width: 14px; height: 14px;
+      writing-mode: horizontal-tb;
+      direction: ltr;
+      width: 140px; height: 2px; flex: none;
     }
     .sun-ico, .moon-ico { width: 13px; height: 13px; }
 
-    /* ── Bottom nav: slimmer ── */
-    .bottom-nav {
-      height: 48px;
-      padding: 0 8px;
-    }
-    .nav-item {
-      padding: 0 6px;
-      font-size: 8px; letter-spacing: 0.1em;
-      gap: 2px;
-    }
+    /* Bottom nav: slimmer */
+    .bottom-nav { height: 48px; padding: 0 8px; }
+    .bottom-nav.ui-hidden { transform: translateY(100%); }
+    .nav-item { padding: 0 6px; font-size: 8px; letter-spacing: 0.1em; gap: 2px; }
     .nav-item .nav-icon { width: 16px; height: 16px; }
 
-    /* Nav amenities dropdown: compact 3-col grid */
+    /* Nav dropdown: scrollable, fixed */
     .nav-dropdown {
-      bottom: calc(100% + 8px);
-      min-width: 210px;
-      padding: 8px;
-      border-radius: 12px;
-      max-height: 55vh;
-      overflow-y: auto;
+      position: fixed;
+      bottom: 56px; left: auto;
+      transform: none;
+      min-width: 210px; padding: 8px; border-radius: 12px;
+      max-height: 55vh; overflow-y: auto;
     }
+    .nav-item.open .nav-dropdown { transform: none; }
     .nav-dropdown-title { font-size: 9px; padding: 4px 8px 8px; }
     .nav-dd-grid { grid-template-columns: 1fr 1fr 1fr; gap: 3px; }
     .nav-dd-item { padding: 8px 7px; gap: 3px; }
@@ -603,28 +460,23 @@
     .nav-dd-item .dd-item-label { font-size: 8px; }
     .nav-dd-item .dd-item-sub { display: none; }
 
-    /* ── Unit search panel: matches slim nav ── */
-    .unit-panel {
-      width: 255px;
-      top: 0;
-      bottom: 48px;
-      padding: 40px 14px 14px;
-      gap: 10px;
-    }
+    /* Unit search panel */
+    .unit-panel { width: 255px; top: 0; bottom: 48px; padding: 40px 14px 14px; gap: 10px; }
     .panel-heading { font-size: 15px; padding-bottom: 8px; }
     .panel-section-label { margin-bottom: 4px; }
     .unit-legend { gap: 4px; }
     .legend-row { font-size: 10px; }
-    .dd-option { padding: 6px 8px; font-size: 11px; }
+
+    /* Toggle button position on mobile — shown above where nav would be */
+    .ui-toggle-btn { bottom: 10px; }
   }
 
-  /* Very narrow landscape phones (< 600px wide) — hide nav labels */
+  /* Very narrow landscape — icon-only nav */
   @media (max-height: 500px) and (orientation: landscape) and (max-width: 599px) {
     .nav-item { font-size: 0; gap: 0; }
     .nav-item .nav-icon { width: 18px; height: 18px; }
     .bottom-nav { padding: 0 4px; }
   }
-
 </style>
 </head>
 <body>
@@ -633,146 +485,97 @@
   <canvas id="bgCanvas" class="bg-canvas"></canvas>
 </div>
 
-<!-- loading / error indicator -->
 <div class="video-status" id="videoStatus">
   <span id="statusText">Loading frames…</span>
   <span class="progress-bar"><span class="progress-fill" id="progressFill"></span></span>
 </div>
 
-<!-- COMPASS -->
 <div class="compass">N</div>
-
-<!-- BRAND -->
 <div class="brand">Karl Detroit</div>
 
-<!-- FILTER BAR (top) -->
-<div class="filter-bar">
+<!-- FILTER BAR -->
+<div class="filter-bar" id="filterBar">
 
-  <div class="filter-chip" id="fc-plot" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-plot">
     <div class="chip-dot"></div>
     Plot Type
     <div class="caret"></div>
-    <div class="filter-dropdown">
+    <div class="filter-dropdown" id="dd-plot">
       <div class="filter-dropdown-header">Select Plot Type</div>
-      <div class="dd-option selected" onclick="toggleDD(event,this)">
-        <div class="dd-check">✓</div>Residential<div class="dd-badge">42</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Commercial<div class="dd-badge">12</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Duplex<div class="dd-badge">8</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Penthouse<div class="dd-badge">4</div>
-      </div>
+      <div class="dd-option selected" data-chip="fc-plot"><div class="dd-check">✓</div>Residential<div class="dd-badge">42</div></div>
+      <div class="dd-option" data-chip="fc-plot"><div class="dd-check"></div>Commercial<div class="dd-badge">12</div></div>
+      <div class="dd-option" data-chip="fc-plot"><div class="dd-check"></div>Duplex<div class="dd-badge">8</div></div>
+      <div class="dd-option" data-chip="fc-plot"><div class="dd-check"></div>Penthouse<div class="dd-badge">4</div></div>
     </div>
   </div>
 
-  <div class="filter-chip" id="fc-avail" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-avail">
     <div class="chip-dot"></div>
     Availability
     <div class="caret"></div>
-    <div class="filter-dropdown">
+    <div class="filter-dropdown" id="dd-avail">
       <div class="filter-dropdown-header">Unit Availability</div>
-      <div class="dd-option selected" onclick="toggleDD(event,this)">
-        <div class="avail-dot" style="background:oklch(65% 0.18 145)"></div>
-        Available<div class="dd-badge">28</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="avail-dot" style="background:oklch(62% 0.18 30)"></div>
-        Reserved<div class="dd-badge">14</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="avail-dot" style="background:oklch(50% 0.0 0)"></div>
-        Sold<div class="dd-badge">20</div>
-      </div>
+      <div class="dd-option selected" data-chip="fc-avail"><div class="avail-dot" style="background:oklch(65% 0.18 145)"></div>Available<div class="dd-badge">28</div></div>
+      <div class="dd-option" data-chip="fc-avail"><div class="avail-dot" style="background:oklch(62% 0.18 30)"></div>Reserved<div class="dd-badge">14</div></div>
+      <div class="dd-option" data-chip="fc-avail"><div class="avail-dot" style="background:oklch(50% 0.0 0)"></div>Sold<div class="dd-badge">20</div></div>
     </div>
   </div>
 
-  <div class="filter-chip" id="fc-rooms" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-rooms">
     <div class="chip-dot"></div>
     Bedrooms
     <div class="caret"></div>
-    <div class="filter-dropdown">
+    <div class="filter-dropdown" id="dd-rooms">
       <div class="filter-dropdown-header">Number of Bedrooms</div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Studio<div class="dd-badge">6</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>1 Bedroom<div class="dd-badge">18</div>
-      </div>
-      <div class="dd-option selected" onclick="toggleDD(event,this)">
-        <div class="dd-check">✓</div>2 Bedrooms<div class="dd-badge">22</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>3 Bedrooms<div class="dd-badge">10</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>4+ Bedrooms<div class="dd-badge">6</div>
-      </div>
+      <div class="dd-option" data-chip="fc-rooms"><div class="dd-check"></div>Studio<div class="dd-badge">6</div></div>
+      <div class="dd-option" data-chip="fc-rooms"><div class="dd-check"></div>1 Bedroom<div class="dd-badge">18</div></div>
+      <div class="dd-option selected" data-chip="fc-rooms"><div class="dd-check">✓</div>2 Bedrooms<div class="dd-badge">22</div></div>
+      <div class="dd-option" data-chip="fc-rooms"><div class="dd-check"></div>3 Bedrooms<div class="dd-badge">10</div></div>
+      <div class="dd-option" data-chip="fc-rooms"><div class="dd-check"></div>4+ Bedrooms<div class="dd-badge">6</div></div>
     </div>
   </div>
 
-  <div class="filter-chip" id="fc-dir" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-dir">
     <div class="chip-dot"></div>
     Direction
     <div class="caret"></div>
-    <div class="filter-dropdown">
+    <div class="filter-dropdown" id="dd-dir">
       <div class="filter-dropdown-header">Room Facing</div>
-      <div class="dd-option selected" onclick="toggleDD(event,this)">
-        <div class="dd-check">✓</div>North-Facing<div class="dd-badge">12</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>South-Facing<div class="dd-badge">15</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>East-Facing<div class="dd-badge">9</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>West-Facing<div class="dd-badge">9</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Corner Unit<div class="dd-badge">7</div>
-      </div>
+      <div class="dd-option selected" data-chip="fc-dir"><div class="dd-check">✓</div>North-Facing<div class="dd-badge">12</div></div>
+      <div class="dd-option" data-chip="fc-dir"><div class="dd-check"></div>South-Facing<div class="dd-badge">15</div></div>
+      <div class="dd-option" data-chip="fc-dir"><div class="dd-check"></div>East-Facing<div class="dd-badge">9</div></div>
+      <div class="dd-option" data-chip="fc-dir"><div class="dd-check"></div>West-Facing<div class="dd-badge">9</div></div>
+      <div class="dd-option" data-chip="fc-dir"><div class="dd-check"></div>Corner Unit<div class="dd-badge">7</div></div>
     </div>
   </div>
 
-  <div class="filter-chip" id="fc-floor" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-floor">
     <div class="chip-dot"></div>
     Floor
     <div class="caret"></div>
-    <div class="filter-dropdown">
+    <div class="filter-dropdown" id="dd-floor">
       <div class="filter-dropdown-header">Floor Level</div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Ground (1–2)<div class="dd-badge">10</div>
-      </div>
-      <div class="dd-option selected" onclick="toggleDD(event,this)">
-        <div class="dd-check">✓</div>Mid (3–5)<div class="dd-badge">24</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>High (6–8)<div class="dd-badge">18</div>
-      </div>
-      <div class="dd-option" onclick="toggleDD(event,this)">
-        <div class="dd-check"></div>Penthouse (9+)<div class="dd-badge">4</div>
-      </div>
+      <div class="dd-option" data-chip="fc-floor"><div class="dd-check"></div>Ground (1–2)<div class="dd-badge">10</div></div>
+      <div class="dd-option selected" data-chip="fc-floor"><div class="dd-check">✓</div>Mid (3–5)<div class="dd-badge">24</div></div>
+      <div class="dd-option" data-chip="fc-floor"><div class="dd-check"></div>High (6–8)<div class="dd-badge">18</div></div>
+      <div class="dd-option" data-chip="fc-floor"><div class="dd-check"></div>Penthouse (9+)<div class="dd-badge">4</div></div>
     </div>
   </div>
 
-  <div class="filter-chip" id="fc-price" onclick="toggleChip(this)">
+  <div class="filter-chip" id="fc-price">
     <div class="chip-dot"></div>
     Budget
     <div class="caret"></div>
-    <div class="filter-dropdown" style="min-width:220px">
+    <div class="filter-dropdown" id="dd-price" style="min-width:240px">
       <div class="filter-dropdown-header">Price Range</div>
-      <div style="padding: 10px 8px 6px; display:flex; flex-direction:column; gap:14px;">
+      <div style="padding:10px 8px 6px; display:flex; flex-direction:column; gap:16px;">
         <div>
-          <div class="panel-section-label" style="margin-bottom:6px">Min — ₹ 45L</div>
-          <input type="range" class="panel-range-input" min="20" max="200" value="45" style="width:100%">
+          <div class="price-label" id="minPriceLabel">Min — ₹ 45 L</div>
+          <input type="range" class="panel-range-input" id="minPriceRange" min="20" max="200" value="45" style="width:100%">
         </div>
         <div>
-          <div class="panel-section-label" style="margin-bottom:6px">Max — ₹ 1.8 Cr</div>
-          <input type="range" class="panel-range-input" min="20" max="500" value="180" style="width:100%">
+          <div class="price-label" id="maxPriceLabel">Max — ₹ 1.8 Cr</div>
+          <input type="range" class="panel-range-input" id="maxPriceRange" min="20" max="500" value="180" style="width:100%">
         </div>
       </div>
     </div>
@@ -780,8 +583,8 @@
 
 </div>
 
-<!-- ENVIRONMENT CONTROL (now near bottom, above the nav) -->
-<div class="env-bar">
+<!-- ENVIRONMENT CONTROL -->
+<div class="env-bar" id="envBar">
   <div class="env-time-display">
     <span class="env-label">Environment</span>
     <span id="timeVal">18:00</span>
@@ -789,19 +592,12 @@
   <div class="env-slider-wrap">
     <svg class="sun-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
       <circle cx="10" cy="10" r="3.5"/>
-      <line x1="10" y1="2" x2="10" y2="4.5"/>
-      <line x1="10" y1="15.5" x2="10" y2="18"/>
-      <line x1="2" y1="10" x2="4.5" y2="10"/>
-      <line x1="15.5" y1="10" x2="18" y2="10"/>
-      <line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/>
-      <line x1="13.8" y1="13.8" x2="15.6" y2="15.6"/>
-      <line x1="15.6" y1="4.4" x2="13.8" y2="6.2"/>
-      <line x1="6.2" y1="13.8" x2="4.4" y2="15.6"/>
+      <line x1="10" y1="2" x2="10" y2="4.5"/><line x1="10" y1="15.5" x2="10" y2="18"/>
+      <line x1="2" y1="10" x2="4.5" y2="10"/><line x1="15.5" y1="10" x2="18" y2="10"/>
+      <line x1="4.4" y1="4.4" x2="6.2" y2="6.2"/><line x1="13.8" y1="13.8" x2="15.6" y2="15.6"/>
+      <line x1="15.6" y1="4.4" x2="13.8" y2="6.2"/><line x1="6.2" y1="13.8" x2="4.4" y2="15.6"/>
     </svg>
-
-    <input type="range" class="env-range" id="envSlider" min="0" max="24" step="0.01" value="18"
-           style="--pct: 75%">
-
+    <input type="range" class="env-range" id="envSlider" min="0" max="24" step="0.01" value="18">
     <svg class="moon-ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M16 12.5A7 7 0 0 1 7.5 4a7 7 0 1 0 8.5 8.5z"/>
     </svg>
@@ -809,16 +605,16 @@
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="bottom-nav">
+<div class="bottom-nav" id="bottomNav">
 
-  <div class="nav-item active" id="nav-home" onclick="toggleNav(this)">
+  <div class="nav-item active" id="nav-home">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <path d="M3 9.5L10 3l7 6.5V18H13v-4.5H7V18H3V9.5z"/>
     </svg>
     Home
   </div>
 
-  <div class="nav-item" id="nav-gallery" onclick="activateNav('nav-gallery')">
+  <div class="nav-item" id="nav-gallery">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
       <rect x="2" y="4" width="16" height="12" rx="1.5"/>
       <circle cx="7" cy="9" r="1.5"/>
@@ -827,79 +623,46 @@
     Gallery
   </div>
 
-  <div class="nav-item" id="nav-surr" onclick="activateNav('nav-surr')">
+  <div class="nav-item" id="nav-surr">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
-      <circle cx="10" cy="10" r="7"/>
-      <circle cx="10" cy="10" r="1"/>
+      <circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="1"/>
       <path d="M10 3v2M10 15v2M3 10h2M15 10h2"/>
     </svg>
     Surroundings
   </div>
 
-  <div class="nav-item" id="nav-amenities" onclick="toggleNav(this)">
+  <div class="nav-item" id="nav-amenities">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
-      <rect x="3" y="3" width="6" height="6" rx="1"/>
-      <rect x="11" y="3" width="6" height="6" rx="1"/>
-      <rect x="3" y="11" width="6" height="6" rx="1"/>
-      <rect x="11" y="11" width="6" height="6" rx="1"/>
+      <rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/>
+      <rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/>
     </svg>
     Amenities
-    <div class="nav-dropdown">
+    <div class="nav-dropdown" id="amenitiesDropdown">
       <div class="nav-dropdown-title">Home Amenities</div>
       <div class="nav-dd-grid">
-        <div class="nav-dd-item selected" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🏊</div>
-          <div class="dd-item-label">Swimming Pool</div>
-          <div class="dd-item-sub">Rooftop · Infinity</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🏋️</div>
-          <div class="dd-item-label">Gymnasium</div>
-          <div class="dd-item-sub">Level 2 · 2400 sq ft</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🌿</div>
-          <div class="dd-item-label">Sky Garden</div>
-          <div class="dd-item-sub">Levels 4 & 7</div>
-        </div>
-        <div class="nav-dd-item selected" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🛗</div>
-          <div class="dd-item-label">Concierge</div>
-          <div class="dd-item-sub">24-hr · Lobby</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🅿️</div>
-          <div class="dd-item-label">Parking</div>
-          <div class="dd-item-sub">Basement B1–B2</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🏸</div>
-          <div class="dd-item-label">Sports Court</div>
-          <div class="dd-item-sub">Badminton · Tennis</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🧖</div>
-          <div class="dd-item-label">Spa & Sauna</div>
-          <div class="dd-item-sub">Level 3 · Private</div>
-        </div>
-        <div class="nav-dd-item" onclick="toggleNavItem(event,this)">
-          <div class="dd-item-icon">🎪</div>
-          <div class="dd-item-label">Clubhouse</div>
-          <div class="dd-item-sub">Events · Lounge</div>
-        </div>
+        <div class="nav-dd-item selected"><div class="dd-item-icon">🏊</div><div class="dd-item-label">Swimming Pool</div><div class="dd-item-sub">Rooftop · Infinity</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🏋️</div><div class="dd-item-label">Gymnasium</div><div class="dd-item-sub">Level 2 · 2400 sq ft</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🌿</div><div class="dd-item-label">Sky Garden</div><div class="dd-item-sub">Levels 4 & 7</div></div>
+        <div class="nav-dd-item selected"><div class="dd-item-icon">🛗</div><div class="dd-item-label">Concierge</div><div class="dd-item-sub">24-hr · Lobby</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🅿️</div><div class="dd-item-label">Parking</div><div class="dd-item-sub">Basement B1–B2</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🏸</div><div class="dd-item-label">Sports Court</div><div class="dd-item-sub">Badminton · Tennis</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🧖</div><div class="dd-item-label">Spa & Sauna</div><div class="dd-item-sub">Level 3 · Private</div></div>
+        <div class="nav-dd-item"><div class="dd-item-icon">🎪</div><div class="dd-item-label">Clubhouse</div><div class="dd-item-sub">Events · Lounge</div></div>
       </div>
     </div>
   </div>
 
-  <div class="nav-item" id="nav-units" onclick="toggleUnitPanel()">
+  <div class="nav-item" id="nav-units">
     <svg class="nav-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.3">
-      <circle cx="9" cy="9" r="5"/>
-      <line x1="13" y1="13" x2="17" y2="17"/>
+      <circle cx="9" cy="9" r="5"/><line x1="13" y1="13" x2="17" y2="17"/>
     </svg>
     Unit Search
   </div>
 
 </div>
+
+<!-- UI TOGGLE BUTTON (mobile landscape) -->
+<button class="ui-toggle-btn" id="uiToggleBtn">⊞ Show Controls</button>
 
 <!-- UNIT SEARCH SIDE PANEL -->
 <div class="unit-panel" id="unitPanel">
@@ -908,8 +671,8 @@
   <div>
     <div class="panel-section-label">Area (sq ft)</div>
     <div class="panel-range">
-      <span>800</span>
-      <input type="range" class="panel-range-input" min="400" max="4000" value="1800">
+      <span id="areaMinLabel">800</span>
+      <input type="range" class="panel-range-input" id="areaRange" min="400" max="4000" value="1800">
       <span>4000</span>
     </div>
   </div>
@@ -917,32 +680,20 @@
   <div>
     <div class="panel-section-label">Availability Legend</div>
     <div class="unit-legend">
-      <div class="legend-row">
-        <div class="legend-dot" style="background:oklch(65% 0.18 145)"></div>
-        Available Units
-        <div class="legend-count">28 units</div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-dot" style="background:oklch(62% 0.18 30)"></div>
-        Reserved
-        <div class="legend-count">14 units</div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-dot" style="background:oklch(45% 0.0 0)"></div>
-        Sold
-        <div class="legend-count">20 units</div>
-      </div>
+      <div class="legend-row"><div class="legend-dot" style="background:oklch(65% 0.18 145)"></div>Available Units<div class="legend-count">28 units</div></div>
+      <div class="legend-row"><div class="legend-dot" style="background:oklch(62% 0.18 30)"></div>Reserved<div class="legend-count">14 units</div></div>
+      <div class="legend-row"><div class="legend-dot" style="background:oklch(45% 0.0 0)"></div>Sold<div class="legend-count">20 units</div></div>
     </div>
   </div>
 
   <div>
     <div class="panel-section-label">Preferred Floor</div>
-    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+    <div class="floor-pills" id="floorPills">
       <div class="weather-pill active">All</div>
-      <div class="weather-pill" onclick="setWeather(this)">1–3</div>
-      <div class="weather-pill" onclick="setWeather(this)">4–6</div>
-      <div class="weather-pill" onclick="setWeather(this)">7–9</div>
-      <div class="weather-pill" onclick="setWeather(this)">Pent</div>
+      <div class="weather-pill">1–3</div>
+      <div class="weather-pill">4–6</div>
+      <div class="weather-pill">7–9</div>
+      <div class="weather-pill">Pent</div>
     </div>
   </div>
 
@@ -964,270 +715,435 @@
 </div>
 
 <script>
-  // ── ENVIRONMENT SLIDER ──────────────────────────────
-  const slider  = document.getElementById('envSlider');
-  const timeVal = document.getElementById('timeVal');
+// ══════════════════════════════════════════════════════
+// ENVIRONMENT SLIDER
+// ══════════════════════════════════════════════════════
+const slider  = document.getElementById('envSlider');
+const timeVal = document.getElementById('timeVal');
 
-  function refreshSliderVisual() {
-    const v = parseFloat(slider.value);
-    const h = Math.floor(v);
-    const m = Math.round((v - h) * 60);
-    timeVal.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
-    const pct = (v / 24) * 100;
-    slider.style.setProperty('--pct', pct + '%');
-    slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(200,175,120,0.2) ${pct}%, rgba(200,175,120,0.2) 100%)`;
+function refreshSliderVisual() {
+  const v = parseFloat(slider.value);
+  const h = Math.floor(v);
+  const m = Math.round((v - h) * 60);
+  timeVal.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  const pct = (v / 24) * 100;
+  slider.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(200,175,120,0.2) ${pct}%, rgba(200,175,120,0.2) 100%)`;
+}
+refreshSliderVisual();
+slider.addEventListener('input', refreshSliderVisual);
+
+// ══════════════════════════════════════════════════════
+// PRICE RANGE SLIDERS — live label + track update
+// ══════════════════════════════════════════════════════
+function formatPrice(val) {
+  val = parseInt(val);
+  if (val >= 100) return '₹ ' + (val / 100).toFixed(1) + ' Cr';
+  return '₹ ' + val + ' L';
+}
+
+function updateRangeTrack(input) {
+  const min = parseFloat(input.min), max = parseFloat(input.max), val = parseFloat(input.value);
+  const pct = ((val - min) / (max - min)) * 100;
+  input.style.background = `linear-gradient(to right, var(--gold) 0%, var(--gold) ${pct}%, rgba(200,175,120,0.2) ${pct}%, rgba(200,175,120,0.2) 100%)`;
+}
+
+const minRange = document.getElementById('minPriceRange');
+const maxRange = document.getElementById('maxPriceRange');
+const minLabel = document.getElementById('minPriceLabel');
+const maxLabel = document.getElementById('maxPriceLabel');
+
+function updateMinPrice() {
+  // Ensure min <= max
+  if (parseInt(minRange.value) > parseInt(maxRange.value)) {
+    minRange.value = maxRange.value;
   }
-  refreshSliderVisual();
-
-  // ─── IMAGE-SEQUENCE SCRUB ───────────────────────────
-  const FRAME_COUNT  = 372;
-  const FRAME_PATH   = 'frames/';
-  const FRAME_PREFIX = 'frame_';
-  const FRAME_PAD    = 4;
-  const FRAME_EXT    = '.jpg';
-  const ENABLE_BLEND = true;
-
-  const canvas       = document.getElementById('bgCanvas');
-  const ctx          = canvas.getContext('2d');
-  const statusEl     = document.getElementById('videoStatus');
-  const statusText   = document.getElementById('statusText');
-  const progressFill = document.getElementById('progressFill');
-
-  const frames      = new Array(FRAME_COUNT);
-  let   loadedCount = 0;
-  let   ready       = false;
-
-  statusEl.classList.add('show');
-
-  function resizeCanvas() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width  = window.innerWidth  * dpr;
-    canvas.height = window.innerHeight * dpr;
-    ctx.imageSmoothingQuality = 'high';
+  minLabel.textContent = 'Min — ' + formatPrice(minRange.value);
+  updateRangeTrack(minRange);
+}
+function updateMaxPrice() {
+  if (parseInt(maxRange.value) < parseInt(minRange.value)) {
+    maxRange.value = minRange.value;
   }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+  maxLabel.textContent = 'Max — ' + formatPrice(maxRange.value);
+  updateRangeTrack(maxRange);
+}
+minRange.addEventListener('input', updateMinPrice);
+maxRange.addEventListener('input', updateMaxPrice);
+updateRangeTrack(minRange);
+updateRangeTrack(maxRange);
 
-  function preload() {
-    for (let i = 0; i < FRAME_COUNT; i++) {
-      const img = new Image();
-      const num = String(i + 1).padStart(FRAME_PAD, '0');
-      img.src = `${FRAME_PATH}${FRAME_PREFIX}${num}${FRAME_EXT}`;
-      img.onload  = onFrameLoad;
-      img.onerror = () => onFrameError(num);
-      frames[i] = img;
+// Area range
+const areaRange = document.getElementById('areaRange');
+const areaMinLabel = document.getElementById('areaMinLabel');
+areaRange.addEventListener('input', () => {
+  areaMinLabel.textContent = areaRange.value;
+  updateRangeTrack(areaRange);
+});
+updateRangeTrack(areaRange);
+
+// ══════════════════════════════════════════════════════
+// FLOOR PILLS — FIXED scoping
+// ══════════════════════════════════════════════════════
+document.getElementById('floorPills').addEventListener('click', function(e) {
+  const pill = e.target.closest('.weather-pill');
+  if (!pill) return;
+  this.querySelectorAll('.weather-pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+});
+
+// ══════════════════════════════════════════════════════
+// FILTER CHIPS — event delegation, no inline onclick
+// ══════════════════════════════════════════════════════
+let openChip = null;
+
+// Handle chip header clicks
+document.getElementById('filterBar').addEventListener('click', function(e) {
+  const chip = e.target.closest('.filter-chip');
+  if (!chip) return;
+
+  // If click was inside the dropdown, don't toggle chip
+  if (e.target.closest('.filter-dropdown')) return;
+
+  e.stopPropagation();
+
+  if (openChip && openChip !== chip) {
+    openChip.classList.remove('open');
+    const prevDd = openChip.querySelector('.filter-dropdown');
+    if (prevDd) prevDd.removeAttribute('style');
+  }
+
+  const isOpen = chip.classList.toggle('open');
+  if (isOpen) {
+    openChip = chip;
+    // Position dropdown correctly on mobile
+    positionDropdown(chip);
+  } else {
+    openChip = null;
+  }
+});
+
+function positionDropdown(chip) {
+  const dd = chip.querySelector('.filter-dropdown');
+  if (!dd) return;
+  const isMobileLandscape = window.innerHeight <= 500 && window.innerWidth > window.innerHeight;
+  if (isMobileLandscape) {
+    const rect = chip.getBoundingClientRect();
+    dd.style.left = Math.min(rect.left, window.innerWidth - 200) + 'px';
+    dd.style.top = (rect.bottom + 6) + 'px';
+  }
+}
+
+// Handle dd-option clicks
+document.addEventListener('click', function(e) {
+  const opt = e.target.closest('.dd-option[data-chip]');
+  if (opt) {
+    e.stopPropagation();
+    opt.classList.toggle('selected');
+    const chk = opt.querySelector('.dd-check');
+    if (chk) chk.textContent = opt.classList.contains('selected') ? '✓' : '';
+    const chipId = opt.dataset.chip;
+    const chip = document.getElementById(chipId);
+    if (chip) {
+      const anySelected = chip.querySelectorAll('.dd-option.selected').length > 0;
+      chip.classList.toggle('active', anySelected || chip.classList.contains('open'));
     }
+    return;
   }
 
-  function onFrameLoad() {
-    loadedCount++;
-    const pct = loadedCount / FRAME_COUNT;
-    progressFill.style.width = (pct * 100) + '%';
-    statusText.textContent = `Loading frames… ${Math.round(pct * 100)}%`;
-    if (loadedCount === FRAME_COUNT) {
-      ready = true;
-      canvas.classList.add('ready');
-      statusEl.classList.remove('show');
-      // initialize displayed frame to the slider's current value
-      displayedFloat = sliderToFrameFloat();
-      targetFloat    = displayedFloat;
-    }
+  // Close open chip if click outside
+  if (openChip && !openChip.contains(e.target)) {
+    openChip.classList.remove('open');
+    openChip = null;
   }
-  function onFrameError(num) {
-    statusText.textContent = `❌ Frame "${FRAME_PREFIX}${num}${FRAME_EXT}" not found in /${FRAME_PATH}`;
-    statusEl.classList.add('error');
-  }
+});
 
-  function sliderToFrameFloat() {
-    const v = parseFloat(slider.value);
-    return (v / 24) * (FRAME_COUNT - 1);
-  }
+// ══════════════════════════════════════════════════════
+// BOTTOM NAV — event delegation
+// ══════════════════════════════════════════════════════
+let openNav = null;
 
-  function drawImgCover(img, alpha) {
-    const iw = img.naturalWidth, ih = img.naturalHeight;
-    if (!iw || !ih) return;
-    const cw = canvas.width, ch = canvas.height;
-    const scale = Math.max(cw / iw, ch / ih);
-    const dw = iw * scale, dh = ih * scale;
-    const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
-    ctx.globalAlpha = alpha;
-    ctx.drawImage(img, dx, dy, dw, dh);
-  }
+document.getElementById('bottomNav').addEventListener('click', function(e) {
+  const item = e.target.closest('.nav-item');
+  if (!item) return;
+  // Don't close if click inside nav-dropdown
+  if (e.target.closest('.nav-dropdown')) return;
 
-  function drawAt(floatIndex) {
-    if (!ready) return;
-    const lo = Math.max(0, Math.floor(floatIndex));
-    const hi = Math.min(FRAME_COUNT - 1, lo + 1);
-    const t  = floatIndex - lo;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (!ENABLE_BLEND || t === 0 || lo === hi) {
-      drawImgCover(frames[lo], 1);
-    } else {
-      drawImgCover(frames[lo], 1);
-      drawImgCover(frames[hi], t);
-    }
-    ctx.globalAlpha = 1;
-  }
+  const id = item.id;
 
-  // ═════════════════════════════════════════════════════════════════
-  // 🎯  INERTIA / SMOOTH-STOP SCRUBBING
-  //   While dragging — playback follows your finger/mouse with a
-  //   tiny lerp for buttery feel. On release, the captured velocity
-  //   keeps the playback gliding forward, decaying with friction
-  //   until it eases to a stop. The slider thumb visually follows.
-  // ═════════════════════════════════════════════════════════════════
-  let targetFloat    = 0;       // where the slider input most recently said
-  let displayedFloat = 0;       // what's actually drawn (may lag/glide)
-  let velocity       = 0;       // frames per millisecond
-  let isDragging     = false;
-  let lastSampleTime = 0;
-  let lastSampleVal  = 0;
-  let lastTickTime   = performance.now();
-
-  // Tweak these to taste:
-  const FRICTION_PER_FRAME = 0.92;   // 0.90 = stops fast, 0.97 = long glide
-  const DRAG_LERP_PER_FRAME = 0.001; // smaller = tighter follow during drag
-  const VELOCITY_EMA        = 0.55;  // weight given to the newest velocity sample
-
-  slider.addEventListener('pointerdown', () => {
-    isDragging     = true;
-    velocity       = 0;
-    lastSampleTime = performance.now();
-    lastSampleVal  = sliderToFrameFloat();
-  });
-  const endDrag = () => { isDragging = false; };
-  slider.addEventListener('pointerup',          endDrag);
-  slider.addEventListener('pointercancel',      endDrag);
-  slider.addEventListener('lostpointercapture', endDrag);
-
-  slider.addEventListener('input', () => {
-    refreshSliderVisual();
-    if (!ready) return;
-    const now      = performance.now();
-    const newFloat = sliderToFrameFloat();
-
-    if (isDragging) {
-      // Build a smoothed velocity (frames per ms) from each sample
-      if (lastSampleTime > 0) {
-        const dt = Math.max(1, now - lastSampleTime);
-        const instantVel = (newFloat - lastSampleVal) / dt;
-        velocity = velocity * (1 - VELOCITY_EMA) + instantVel * VELOCITY_EMA;
-      }
-      lastSampleTime = now;
-      lastSampleVal  = newFloat;
-      targetFloat    = newFloat;
-    } else {
-      // Keyboard / programmatic input — snap directly, no inertia
-      velocity       = 0;
-      targetFloat    = newFloat;
-      displayedFloat = newFloat;
-    }
-  });
-
-  // ── Continuous render loop ──────────────────────────
-  function tick() {
-    const now = performance.now();
-    const dt  = Math.min(50, now - lastTickTime); // cap dt so tab-switches don't catapult
-    lastTickTime = now;
-
-    if (ready) {
-      if (isDragging) {
-        // Follow the slider tightly with a touch of smoothing
-        const k = 1 - Math.pow(DRAG_LERP_PER_FRAME, dt / 16);
-        displayedFloat += (targetFloat - displayedFloat) * k;
-      } else if (Math.abs(velocity) > 0.00005 || Math.abs(displayedFloat - targetFloat) > 0.01) {
-        // GLIDE — apply velocity & friction toward targetFloat
-        displayedFloat += velocity * dt;
-        velocity       *= Math.pow(FRICTION_PER_FRAME, dt / 16);
-
-        // Pull toward target so we always settle exactly there
-        const pullStrength = 1 - Math.pow(0.85, dt / 16);
-        displayedFloat += (targetFloat - displayedFloat) * pullStrength;
-
-        // Clamp at edges
-        if (displayedFloat <= 0)               { displayedFloat = 0;               velocity = 0; }
-        if (displayedFloat >= FRAME_COUNT - 1) { displayedFloat = FRAME_COUNT - 1; velocity = 0; }
-
-      } else {
-        // Tiny final ease to settle exactly
-        const k = 1 - Math.pow(0.001, dt / 16);
-        displayedFloat += (targetFloat - displayedFloat) * k;
-      }
-      drawAt(displayedFloat);
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-
-  preload();
-
-  // ── WEATHER PILLS ───────────────────────────────────
-  function setWeather(el) {
-    el.closest('.weather-row, div').querySelectorAll('.weather-pill').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-  }
-
-  // ── FILTER CHIPS ────────────────────────────────────
-  let openChip = null;
-  function toggleChip(el) {
-    if (openChip && openChip !== el) {
-      openChip.classList.remove('open', 'active');
-    }
-    el.classList.toggle('open');
-    el.classList.toggle('active', el.classList.contains('open'));
-    openChip = el.classList.contains('open') ? el : null;
-  }
-  function toggleDD(evt, el) {
-    evt.stopPropagation();
-    el.classList.toggle('selected');
-    el.querySelector('.dd-check').textContent = el.classList.contains('selected') ? '✓' : '';
-    const chip = el.closest('.filter-chip');
-    const anySelected = chip.querySelectorAll('.dd-option.selected').length > 0;
-    chip.classList.toggle('active', anySelected || chip.classList.contains('open'));
-  }
-  document.addEventListener('click', function(e) {
-    if (openChip && !openChip.contains(e.target)) {
-      openChip.classList.remove('open');
-      openChip = null;
-    }
-  });
-
-  // ── BOTTOM NAV ──────────────────────────────────────
-  let openNav = null;
-  function activateNav(id) {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if (openNav) { openNav.classList.remove('open'); openNav = null; }
-    document.getElementById('unitPanel').classList.remove('open');
-  }
-  function toggleNav(el) {
-    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
-    el.classList.add('active');
-    if (openNav && openNav === el) {
-      el.classList.remove('open');
-      openNav = null;
-      return;
-    }
-    el.classList.add('open');
-    openNav = el;
-    document.getElementById('unitPanel').classList.remove('open');
-  }
-  function toggleUnitPanel() {
-    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active'); n.classList.remove('open'); });
-    document.getElementById('nav-units').classList.add('active');
+  if (id === 'nav-units') {
+    // toggle unit panel
+    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active','open'); });
+    item.classList.add('active');
     if (openNav) { openNav.classList.remove('open'); openNav = null; }
     document.getElementById('unitPanel').classList.toggle('open');
+    return;
   }
-  function toggleNavItem(evt, el) {
-    evt.stopPropagation();
-    el.classList.toggle('selected');
-  }
-  document.addEventListener('click', function(e) {
-    if (openNav && !openNav.contains(e.target)) {
-      openNav.classList.remove('open');
+
+  document.getElementById('unitPanel').classList.remove('open');
+
+  if (item.id === 'nav-amenities') {
+    document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active','open'); });
+    item.classList.add('active');
+    if (openNav === item) {
+      item.classList.remove('open');
       openNav = null;
+    } else {
+      item.classList.add('open');
+      openNav = item;
     }
-  });
+    return;
+  }
+
+  document.querySelectorAll('.nav-item').forEach(n => { n.classList.remove('active','open'); });
+  item.classList.add('active');
+  if (openNav) { openNav.classList.remove('open'); openNav = null; }
+});
+
+// Nav dd items
+document.getElementById('amenitiesDropdown').addEventListener('click', function(e) {
+  e.stopPropagation();
+  const item = e.target.closest('.nav-dd-item');
+  if (item) item.classList.toggle('selected');
+});
+
+// Close nav dropdown on outside click
+document.addEventListener('click', function(e) {
+  if (openNav && !openNav.contains(e.target)) {
+    openNav.classList.remove('open');
+    openNav = null;
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// AUTO-HIDE UI on mobile landscape + toggle button
+// ══════════════════════════════════════════════════════
+const filterBar  = document.getElementById('filterBar');
+const bottomNav  = document.getElementById('bottomNav');
+const uiToggleBtn = document.getElementById('uiToggleBtn');
+let uiHideTimer  = null;
+let uiVisible    = true;
+
+function isMobileLandscape() {
+  return window.innerHeight <= 500 && window.innerWidth > window.innerHeight;
+}
+
+function hideUI() {
+  if (!isMobileLandscape()) return;
+  filterBar.classList.add('ui-hidden');
+  bottomNav.classList.add('ui-hidden');
+  uiToggleBtn.textContent = '⊞ Show Controls';
+  uiToggleBtn.style.opacity = '1';
+  uiVisible = false;
+  // close any open dropdowns
+  if (openChip) { openChip.classList.remove('open'); openChip = null; }
+  if (openNav)  { openNav.classList.remove('open');  openNav = null;  }
+}
+
+function showUI() {
+  filterBar.classList.remove('ui-hidden');
+  bottomNav.classList.remove('ui-hidden');
+  uiToggleBtn.textContent = '✕ Hide Controls';
+  uiVisible = true;
+  resetHideTimer();
+}
+
+function resetHideTimer() {
+  clearTimeout(uiHideTimer);
+  if (isMobileLandscape()) {
+    uiHideTimer = setTimeout(hideUI, 3000);
+  }
+}
+
+uiToggleBtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  if (uiVisible) hideUI();
+  else showUI();
+});
+
+// Show UI on any tap on screen (not on interactive elements)
+document.addEventListener('pointerdown', function(e) {
+  if (!isMobileLandscape()) return;
+  if (e.target.closest('.filter-bar, .bottom-nav, .unit-panel, .ui-toggle-btn, .compass, .env-bar')) {
+    resetHideTimer();
+    return;
+  }
+  if (!uiVisible) {
+    showUI();
+  } else {
+    resetHideTimer();
+  }
+});
+
+// Start the timer on mobile landscape
+window.addEventListener('resize', () => {
+  if (isMobileLandscape()) {
+    resetHideTimer();
+  } else {
+    clearTimeout(uiHideTimer);
+    filterBar.classList.remove('ui-hidden');
+    bottomNav.classList.remove('ui-hidden');
+    uiVisible = true;
+  }
+});
+
+// Initialize on load
+if (isMobileLandscape()) {
+  resetHideTimer();
+}
+
+// ══════════════════════════════════════════════════════
+// IMAGE SEQUENCE CANVAS
+// ══════════════════════════════════════════════════════
+const FRAME_COUNT  = 372;
+const FRAME_PATH   = 'frames/';
+const FRAME_PREFIX = 'frame_';
+const FRAME_PAD    = 4;
+const FRAME_EXT    = '.jpg';
+const ENABLE_BLEND = true;
+
+const canvas       = document.getElementById('bgCanvas');
+const ctx          = canvas.getContext('2d');
+const statusEl     = document.getElementById('videoStatus');
+const statusText   = document.getElementById('statusText');
+const progressFill = document.getElementById('progressFill');
+
+const frames      = new Array(FRAME_COUNT);
+let   loadedCount = 0;
+let   ready       = false;
+
+statusEl.classList.add('show');
+
+function resizeCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width  = window.innerWidth  * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.imageSmoothingQuality = 'high';
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+function preload() {
+  for (let i = 0; i < FRAME_COUNT; i++) {
+    const img = new Image();
+    const num = String(i + 1).padStart(FRAME_PAD, '0');
+    img.src = `${FRAME_PATH}${FRAME_PREFIX}${num}${FRAME_EXT}`;
+    img.onload  = onFrameLoad;
+    img.onerror = () => onFrameError(num);
+    frames[i] = img;
+  }
+}
+
+function onFrameLoad() {
+  loadedCount++;
+  const pct = loadedCount / FRAME_COUNT;
+  progressFill.style.width = (pct * 100) + '%';
+  statusText.textContent = `Loading frames… ${Math.round(pct * 100)}%`;
+  if (loadedCount === FRAME_COUNT) {
+    ready = true;
+    canvas.classList.add('ready');
+    statusEl.classList.remove('show');
+    displayedFloat = sliderToFrameFloat();
+    targetFloat    = displayedFloat;
+  }
+}
+function onFrameError(num) {
+  statusText.textContent = `❌ Frame "${FRAME_PREFIX}${num}${FRAME_EXT}" not found in /${FRAME_PATH}`;
+  statusEl.classList.add('error');
+}
+
+function sliderToFrameFloat() {
+  return (parseFloat(slider.value) / 24) * (FRAME_COUNT - 1);
+}
+
+function drawImgCover(img, alpha) {
+  const iw = img.naturalWidth, ih = img.naturalHeight;
+  if (!iw || !ih) return;
+  const cw = canvas.width, ch = canvas.height;
+  const scale = Math.max(cw / iw, ch / ih);
+  const dw = iw * scale, dh = ih * scale;
+  const dx = (cw - dw) / 2, dy = (ch - dh) / 2;
+  ctx.globalAlpha = alpha;
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
+
+function drawAt(floatIndex) {
+  if (!ready) return;
+  const lo = Math.max(0, Math.floor(floatIndex));
+  const hi = Math.min(FRAME_COUNT - 1, lo + 1);
+  const t  = floatIndex - lo;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!ENABLE_BLEND || t === 0 || lo === hi) {
+    drawImgCover(frames[lo], 1);
+  } else {
+    drawImgCover(frames[lo], 1);
+    drawImgCover(frames[hi], t);
+  }
+  ctx.globalAlpha = 1;
+}
+
+let targetFloat    = 0;
+let displayedFloat = 0;
+let velocity       = 0;
+let isDragging     = false;
+let lastSampleTime = 0;
+let lastSampleVal  = 0;
+let lastTickTime   = performance.now();
+
+const FRICTION_PER_FRAME  = 0.92;
+const DRAG_LERP_PER_FRAME = 0.001;
+const VELOCITY_EMA        = 0.55;
+
+slider.addEventListener('pointerdown', () => {
+  isDragging = true; velocity = 0;
+  lastSampleTime = performance.now(); lastSampleVal = sliderToFrameFloat();
+});
+const endDrag = () => { isDragging = false; };
+slider.addEventListener('pointerup', endDrag);
+slider.addEventListener('pointercancel', endDrag);
+slider.addEventListener('lostpointercapture', endDrag);
+
+slider.addEventListener('input', () => {
+  refreshSliderVisual();
+  if (!ready) return;
+  const now = performance.now();
+  const newFloat = sliderToFrameFloat();
+  if (isDragging) {
+    if (lastSampleTime > 0) {
+      const dt = Math.max(1, now - lastSampleTime);
+      const instantVel = (newFloat - lastSampleVal) / dt;
+      velocity = velocity * (1 - VELOCITY_EMA) + instantVel * VELOCITY_EMA;
+    }
+    lastSampleTime = now; lastSampleVal = newFloat; targetFloat = newFloat;
+  } else {
+    velocity = 0; targetFloat = newFloat; displayedFloat = newFloat;
+  }
+});
+
+function tick() {
+  const now = performance.now();
+  const dt  = Math.min(50, now - lastTickTime);
+  lastTickTime = now;
+  if (ready) {
+    if (isDragging) {
+      const k = 1 - Math.pow(DRAG_LERP_PER_FRAME, dt / 16);
+      displayedFloat += (targetFloat - displayedFloat) * k;
+    } else if (Math.abs(velocity) > 0.00005 || Math.abs(displayedFloat - targetFloat) > 0.01) {
+      displayedFloat += velocity * dt;
+      velocity *= Math.pow(FRICTION_PER_FRAME, dt / 16);
+      const pull = 1 - Math.pow(0.85, dt / 16);
+      displayedFloat += (targetFloat - displayedFloat) * pull;
+      if (displayedFloat <= 0)               { displayedFloat = 0;               velocity = 0; }
+      if (displayedFloat >= FRAME_COUNT - 1) { displayedFloat = FRAME_COUNT - 1; velocity = 0; }
+    } else {
+      const k = 1 - Math.pow(0.001, dt / 16);
+      displayedFloat += (targetFloat - displayedFloat) * k;
+    }
+    drawAt(displayedFloat);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+preload();
 </script>
 </body>
 </html>
